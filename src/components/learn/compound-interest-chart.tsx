@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Sparkles } from "lucide-react";
 import {
   CartesianGrid,
   Legend,
@@ -66,7 +67,10 @@ export function CompoundInterestChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="size-5 shrink-0 text-primary" aria-hidden="true" />
+          {t("title")}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="growth">

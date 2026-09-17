@@ -2,7 +2,18 @@
 
 import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { AlertTriangle, CalendarClock, CheckCircle2, PiggyBank, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  CalendarRange,
+  CheckCircle2,
+  Lightbulb,
+  LineChart,
+  PieChart,
+  PiggyBank,
+  Scale,
+  Wallet,
+} from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GrowthChart } from "@/components/charts/growth-chart";
@@ -109,7 +120,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {/* 3. กราฟเส้นการเติบโตของเงินออม */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("results.chart.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <LineChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("results.chart.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <GrowthChart rows={simulation.rows} target={corpus.selected} currentAge={input.currentAge} />
@@ -119,7 +133,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {/* 4. กราฟวงกลมสัดส่วนพอร์ต */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("results.portfolio.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <PieChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("results.portfolio.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <PortfolioPie allocation={riskProfile.allocation} />
@@ -137,7 +154,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {/* 5. คำแนะนำการออมและการลงทุน */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("results.recommend.savingTips.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("results.recommend.savingTips.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
@@ -157,7 +177,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {/* 6. ตารางแผนการออมรายปี */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("results.table.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarRange className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("results.table.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <YearlyTable rows={simulation.rows} />
@@ -167,7 +190,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {/* 7. เปรียบเทียบ 3 วิธีคำนวณ */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("results.comparison.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("results.comparison.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <MethodComparison corpus={corpus} selectedMethod={input.corpusMethod} />

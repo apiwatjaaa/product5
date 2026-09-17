@@ -4,7 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch, type FieldError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import {
+  Landmark,
+  Loader2,
+  PiggyBank,
+  Plus,
+  SlidersHorizontal,
+  Target,
+  Trash2,
+  User,
+} from "lucide-react";
 
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -151,7 +160,10 @@ export function PlanForm({
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t("planForm.basicCard.title")}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <User className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("planForm.basicCard.title")}
+            </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
@@ -265,7 +277,12 @@ export function PlanForm({
 
         <Accordion className="space-y-4">
           <AccordionItem value="pension" className="rounded-lg border px-4">
-            <AccordionTrigger>{t("planForm.pensionCard.title")}</AccordionTrigger>
+            <AccordionTrigger>
+              <span className="flex items-center gap-2">
+                <Landmark className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                {t("planForm.pensionCard.title")}
+              </span>
+            </AccordionTrigger>
             <AccordionContent className="space-y-3">
               <p className="text-sm text-muted-foreground">{t("planForm.pensionCard.description")}</p>
               <div className="space-y-1.5">
@@ -283,7 +300,12 @@ export function PlanForm({
           </AccordionItem>
 
           <AccordionItem value="goals" className="rounded-lg border px-4">
-            <AccordionTrigger>{t("planForm.goalsCard.title")}</AccordionTrigger>
+            <AccordionTrigger>
+              <span className="flex items-center gap-2">
+                <Target className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                {t("planForm.goalsCard.title")}
+              </span>
+            </AccordionTrigger>
             <AccordionContent className="space-y-4">
               <p className="text-sm text-muted-foreground">{t("planForm.goalsCard.description")}</p>
               {fields.map((field, index) => (
@@ -324,7 +346,12 @@ export function PlanForm({
           </AccordionItem>
 
           <AccordionItem value="advanced" className="rounded-lg border px-4">
-            <AccordionTrigger>{t("planForm.advancedCard.title")}</AccordionTrigger>
+            <AccordionTrigger>
+              <span className="flex items-center gap-2">
+                <SlidersHorizontal className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                {t("planForm.advancedCard.title")}
+              </span>
+            </AccordionTrigger>
             <AccordionContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="inflationRate">{t("planForm.advancedCard.inflationRate")}</Label>
@@ -388,7 +415,10 @@ export function PlanForm({
 
       <Card className="lg:sticky lg:top-6">
         <CardHeader>
-          <CardTitle>{t("planForm.livePreview.title")}</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <PiggyBank className="size-5 shrink-0 text-primary" aria-hidden="true" />
+            {t("planForm.livePreview.title")}
+          </CardTitle>
           <CardDescription>{t("planForm.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
