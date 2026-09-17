@@ -168,9 +168,7 @@
       "submitting": "Logging in...",
       "noAccount": "Don't have an account?",
       "registerLink": "Sign up",
-      "forgotPassword": "Forgot password?",
-      "googleButton": "Log in with Google",
-      "orDivider": "or"
+      "forgotPassword": "Forgot password?"
     },
     "register": {
       "title": "Sign up",

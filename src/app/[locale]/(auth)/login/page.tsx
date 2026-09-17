@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 
 import { Link, useRouter } from "@/i18n/navigation";
@@ -13,13 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/supabase/auth-errors";
-import { getCallbackUrl } from "@/lib/supabase/redirect-url";
 import { loginSchema, type LoginValues } from "@/lib/validation/authSchema";
 
 export default function LoginPage() {
   const t = useTranslations("auth.login");
   const tErrors = useTranslations("auth.errors");
-  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
@@ -46,14 +44,6 @@ export default function LoginPage() {
     }
     router.push(next);
     router.refresh();
-  };
-
-  const onGoogleLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: getCallbackUrl(locale, next) },
-    });
   };
 
   return (
@@ -83,16 +73,6 @@ export default function LoginPage() {
           </Link>
         </p>
       </form>
-
-      <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-        <div className="h-px flex-1 bg-border" />
-        {t("orDivider")}
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <Button type="button" variant="outline" className="w-full" onClick={onGoogleLogin}>
-        {t("googleButton")}
-      </Button>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("noAccount")}{" "}

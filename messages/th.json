@@ -168,9 +168,7 @@
       "submitting": "กำลังเข้าสู่ระบบ...",
       "noAccount": "ยังไม่มีบัญชี?",
       "registerLink": "สมัครสมาชิก",
-      "forgotPassword": "ลืมรหัสผ่าน?",
-      "googleButton": "เข้าสู่ระบบด้วย Google",
-      "orDivider": "หรือ"
+      "forgotPassword": "ลืมรหัสผ่าน?"
     },
     "register": {
       "title": "สมัครสมาชิก",
