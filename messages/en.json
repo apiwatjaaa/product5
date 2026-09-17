@@ -263,6 +263,11 @@
     "saveAndView": "Save plan",
     "saving": "Saving..."
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for may have been removed, or the link is incorrect.",
+    "backHome": "Back to home"
+  },
   "learn": {
     "hub": {
       "title": "Financial knowledge",
