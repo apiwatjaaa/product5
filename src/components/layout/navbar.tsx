@@ -1,3 +1,4 @@
+import { PiggyBank } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ export async function Navbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="border-b print:hidden">
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 print:hidden print:static">
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2">
-        <Link href="/" className="font-semibold">
+        <Link href="/" className="flex items-center gap-1.5 font-semibold">
+          <PiggyBank className="size-5 text-primary" aria-hidden="true" />
           {t("brand.name")}
         </Link>
         <nav className="flex flex-wrap items-center gap-1">

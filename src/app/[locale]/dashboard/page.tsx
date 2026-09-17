@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -36,6 +37,9 @@ export default async function DashboardPage({
 
       {!plans || plans.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
+          <div className="mb-1 flex size-12 items-center justify-center rounded-full bg-accent text-primary">
+            <Sparkles className="size-6" aria-hidden="true" />
+          </div>
           <p className="font-medium">{t("empty.title")}</p>
           <p className="text-sm text-muted-foreground">{t("empty.description")}</p>
           <Button render={<Link href="/plan/new">{t("empty.cta")}</Link>} className="mt-2" />

@@ -17,7 +17,21 @@
   "landing": {
     "heroTitle": "Know how much you need before you can retire comfortably",
     "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that accounts for inflation and investment returns.",
-    "cta": "Start calculating for free"
+    "cta": "Start calculating for free",
+    "features": {
+      "calculate": {
+        "title": "Calculate the corpus you need",
+        "description": "Fill in your details once and instantly see how much you need at retirement, and how much to save each month to get there."
+      },
+      "track": {
+        "title": "See your savings grow",
+        "description": "Charts and a year-by-year table that already account for inflation and investment returns, no manual math required."
+      },
+      "learn": {
+        "title": "Learn the financial basics",
+        "description": "Short, plain-language articles on compound interest, inflation, and risk before you start planning for real."
+      }
+    }
   },
   "riskLevel": {
     "conservative": "Conservative",

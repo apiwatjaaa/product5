@@ -49,7 +49,7 @@ export function PlanCard({
   if (deleted) return null;
 
   return (
-    <Card>
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader className="flex flex-row items-start justify-between gap-2">
         <CardTitle className="text-base">
           <Link href={`/plan/${id}`} className="hover:underline">

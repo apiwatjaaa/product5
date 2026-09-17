@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ARTICLE_ICONS } from "@/components/learn/article-icons";
 import { CompoundInterestChart } from "@/components/learn/compound-interest-chart";
 import { RiskProfileTable } from "@/components/learn/risk-profile-table";
 import { LEARN_ARTICLES, getLearnArticle } from "@/lib/learn/articles";
@@ -26,6 +27,7 @@ export default async function LearnArticlePage({
 
   const t = await getTranslations("learn.article");
   const isTh = locale === "th";
+  const Icon = ARTICLE_ICONS[article.slug];
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -39,6 +41,9 @@ export default async function LearnArticlePage({
         <ArrowLeft className="size-4" /> {t("backToHub")}
       </Button>
 
+      <div className="mb-3 flex size-11 items-center justify-center rounded-lg bg-accent text-primary">
+        <Icon className="size-5" aria-hidden="true" />
+      </div>
       <h1 className="text-2xl font-semibold text-balance sm:text-3xl">
         {isTh ? article.titleTh : article.titleEn}
       </h1>

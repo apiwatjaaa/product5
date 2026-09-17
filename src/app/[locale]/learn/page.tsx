@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ARTICLE_ICONS } from "@/components/learn/article-icons";
 import { LEARN_ARTICLES } from "@/lib/learn/articles";
 
 export default async function LearnHubPage({
@@ -20,20 +21,26 @@ export default async function LearnHubPage({
       <p className="mt-2 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {LEARN_ARTICLES.map((article) => (
-          <Link key={article.slug} href={`/learn/${article.slug}`} className="group block h-full">
-            <Card className="h-full transition-colors group-hover:border-primary/40">
-              <CardHeader>
-                <CardTitle>{isTh ? article.titleTh : article.titleEn}</CardTitle>
-                <CardDescription>{isTh ? article.summaryTh : article.summaryEn}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center gap-1 text-sm font-medium text-primary">
-                {t("readArticle")}
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+        {LEARN_ARTICLES.map((article) => {
+          const Icon = ARTICLE_ICONS[article.slug];
+          return (
+            <Link key={article.slug} href={`/learn/${article.slug}`} className="group block h-full">
+              <Card className="h-full transition-shadow group-hover:border-primary/40 group-hover:shadow-md">
+                <CardHeader>
+                  <div className="mb-1 flex size-10 items-center justify-center rounded-lg bg-accent text-primary">
+                    <Icon className="size-5" aria-hidden="true" />
+                  </div>
+                  <CardTitle>{isTh ? article.titleTh : article.titleEn}</CardTitle>
+                  <CardDescription>{isTh ? article.summaryTh : article.summaryEn}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center gap-1 text-sm font-medium text-primary">
+                  {t("readArticle")}
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </main>
   );

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CalendarClock, CheckCircle2, PiggyBank, Wallet } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GrowthChart } from "@/components/charts/growth-chart";
@@ -51,7 +51,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+              <PiggyBank className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.corpusNeeded")}
             </CardTitle>
           </CardHeader>
@@ -62,7 +63,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+              <Wallet className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.requiredMonthly")}
             </CardTitle>
           </CardHeader>
@@ -78,7 +80,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.expenseAtRetirement")}
             </CardTitle>
           </CardHeader>
