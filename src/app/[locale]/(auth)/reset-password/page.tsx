@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 
 import { useRouter } from "@/i18n/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -61,6 +62,7 @@ export default function ResetPasswordPage() {
           {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             {isSubmitting ? t("submitting") : t("submit")}
           </Button>
         </form>

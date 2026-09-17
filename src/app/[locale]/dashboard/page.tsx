@@ -31,7 +31,7 @@ export default async function DashboardPage({
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold sm:text-3xl">{t("title")}</h1>
         <Button render={<Link href="/plan/new">{t("newPlan")}</Link>} />
       </div>
 

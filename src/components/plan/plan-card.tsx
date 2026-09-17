@@ -57,7 +57,9 @@ export function PlanCard({
           </Link>
         </CardTitle>
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+          <DropdownMenuTrigger
+            render={<Button variant="ghost" size="icon-sm" aria-label={t("dashboard.menu.options")} />}
+          >
             <MoreVertical className="size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

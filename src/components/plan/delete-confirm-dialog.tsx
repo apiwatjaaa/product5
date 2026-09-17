@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -70,6 +70,7 @@ export function DeleteConfirmDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction variant="destructive" disabled={isDeleting} onClick={onConfirm}>
+            {isDeleting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             {t("dashboard.deleteDialog.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>

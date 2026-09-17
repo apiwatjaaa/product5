@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Pencil } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,6 +83,7 @@ export function RenameDialog({
             {t("common.cancel")}
           </Button>
           <Button onClick={onSave} disabled={isSaving}>
+            {isSaving && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             {t("common.save")}
           </Button>
         </DialogFooter>

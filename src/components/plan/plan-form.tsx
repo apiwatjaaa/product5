@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch, type FieldError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
-import { Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -381,6 +381,7 @@ export function PlanForm({
         {saveError && <p className="text-sm text-destructive">{saveError}</p>}
 
         <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSaving}>
+          {isSaving && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
           {isSaving ? t("planDetail.saving") : t("planForm.submit")}
         </Button>
       </div>

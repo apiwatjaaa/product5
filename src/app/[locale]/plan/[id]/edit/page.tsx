@@ -35,7 +35,7 @@ export default async function PlanEditPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
-      <h1 className="mb-1 text-2xl font-semibold">{plan.name}</h1>
+      <h1 className="mb-1 text-2xl font-semibold sm:text-3xl">{plan.name}</h1>
       <p className="mb-6 text-sm text-muted-foreground">{t("subtitle")}</p>
       <PlanForm isAuthenticated planId={plan.id} initialValues={values} initialName={plan.name} />
     </main>
