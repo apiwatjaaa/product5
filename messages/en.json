@@ -1,0 +1,287 @@
+{
+  "brand": {
+    "name": "My Retirement Plan",
+    "school": "Sukonthiravit School"
+  },
+  "nav": {
+    "planNew": "Start calculating",
+    "dashboard": "My plans",
+    "learn": "Financial knowledge",
+    "login": "Log in"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
+  },
+  "landing": {
+    "heroTitle": "Know how much you need before you can retire comfortably",
+    "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that accounts for inflation and investment returns.",
+    "cta": "Start calculating for free"
+  },
+  "riskLevel": {
+    "conservative": "Conservative",
+    "moderate": "Moderate",
+    "aggressive": "Aggressive"
+  },
+  "corpusMethod": {
+    "annuity": "Present value of annuity (most accurate)",
+    "simple": "Simple (ignores post-retirement returns)",
+    "rule4": "4% rule"
+  },
+  "planForm": {
+    "title": "Fill in your details to plan for retirement",
+    "subtitle": "The numbers beside the form update instantly as you type",
+    "basicCard": {
+      "title": "Basic information",
+      "currentAge": "Current age",
+      "retirementAge": "Target retirement age",
+      "lifeExpectancy": "Life expectancy",
+      "monthlyExpenseToday": "Desired monthly expense after retirement (today's value)",
+      "currentSavings": "Existing savings/investments",
+      "monthlyContribution": "Amount you can actually save per month",
+      "riskLevel": "Risk level you can tolerate"
+    },
+    "pensionCard": {
+      "title": "Expected pension income",
+      "description": "e.g. Social Security, government pension fund, provident fund",
+      "pensionMonthlyToday": "Monthly pension (today's value)",
+      "note": "Enter today's value — the system will adjust for inflation automatically."
+    },
+    "goalsCard": {
+      "title": "Special goals",
+      "description": "e.g. buying a house, an overseas trip",
+      "namePlaceholder": "e.g. Buy a house",
+      "amountPlaceholder": "Amount (today's value)",
+      "targetAgePlaceholder": "Age when needed",
+      "add": "Add goal",
+      "remove": "Remove"
+    },
+    "advancedCard": {
+      "title": "Advanced settings",
+      "inflationRate": "Annual inflation rate (%)",
+      "annualReturn": "Expected annual return (%)",
+      "contributionGrowth": "Increase savings per year (%)",
+      "corpusMethod": "Corpus calculation method"
+    },
+    "livePreview": {
+      "title": "Quick estimate",
+      "corpusNeeded": "Corpus needed",
+      "requiredMonthly": "Required monthly saving",
+      "onTrack": "You're on track",
+      "gapWarning": "Still short by"
+    },
+    "submit": "See full results",
+    "defaultName": "My Plan"
+  },
+  "validation": {
+    "required": "This field is required",
+    "mustBePositive": "Must be greater than 0",
+    "mustBeNonNegative": "Must not be negative",
+    "retirementAfterCurrent": "Retirement age must be greater than current age",
+    "lifeExpectancyAfterRetirement": "Life expectancy must be greater than retirement age",
+    "currentAgeRange": "Current age must be between 15 and 80",
+    "retirementAgeRange": "Retirement age must be between 40 and 85",
+    "lifeExpectancyRange": "Life expectancy must be between 60 and 110"
+  },
+  "results": {
+    "summary": {
+      "corpusNeeded": "Corpus needed at retirement",
+      "requiredMonthly": "Required monthly saving",
+      "comparedToActual": "compared to what you can actually save",
+      "expenseAtRetirement": "Monthly expense at retirement",
+      "adjustedFromToday": "Inflation-adjusted from {amount} today"
+    },
+    "gapAlert": {
+      "titleShort": "You're short by",
+      "onTrackTitle": "You're saving enough to reach your goal",
+      "onTrackExcess": "You have a surplus of {amount}"
+    },
+    "chart": {
+      "title": "Savings growth over time",
+      "actualBalance": "Actual accumulated savings",
+      "contributed": "Principal contributed",
+      "target": "Target line",
+      "returnArea": "Investment returns"
+    },
+    "portfolio": {
+      "title": "Recommended portfolio allocation",
+      "bondsAndDeposits": "Bonds/deposits",
+      "stocks": "Stocks",
+      "expectedReturnLabel": "Expected return"
+    },
+    "recommend": {
+      "title": "Recommendations",
+      "onTrack": "You're saving enough to reach your goal, with a surplus of {excess} THB.",
+      "increaseSaving": "Increase savings to {requiredMonthly} THB/month (an increase of {increase} THB).",
+      "delayRetirement": "Or delay retirement to age {newRetirementAge}.",
+      "reduceExpense": "Or reduce your post-retirement expense to {maxMonthlyExpenseToday} THB/month (today's value).",
+      "increaseRisk": "Or shift to a higher-risk portfolio, which would close the gap but carries a higher chance of losing principal.",
+      "savingTips": {
+        "title": "Saving and investing principles",
+        "payYourselfFirst": "Pay yourself first — move money to savings as soon as your salary arrives.",
+        "autoTransfer": "Set up an automatic transfer on payday so you don't forget or spend it first.",
+        "reviewYearly": "Review your financial plan at least once a year.",
+        "nearRetirement": "As retirement gets closer (under 10 years away), gradually reduce your stock allocation to lower risk."
+      }
+    },
+    "table": {
+      "title": "Year-by-year savings plan",
+      "year": "Year",
+      "age": "Age",
+      "monthlyContribution": "Monthly saving",
+      "contributedThisYear": "Total saved this year",
+      "returnThisYear": "Return this year",
+      "goalWithdrawal": "Special goal",
+      "endingBalance": "Ending balance",
+      "showAll": "Show all ({count} years)",
+      "showLess": "Show less"
+    },
+    "comparison": {
+      "title": "Comparing corpus calculation methods",
+      "method": "Method",
+      "amount": "Corpus needed",
+      "note": "When the post-retirement period is exactly 25 years, the simple method and the 4% rule always give the same result — this is not a bug."
+    },
+    "disclaimer": {
+      "title": "Please note",
+      "body": "This calculation is an estimate for educational purposes only, based on the assumptions you entered and expected rates of return that may not occur in reality. Past performance does not guarantee future returns, and investing carries the risk of losing principal. This website is not licensed investment advice. Before making real investment decisions, please consult a licensed investment advisor authorized by the Thai SEC."
+    },
+    "pensionAssumption": "The pension is calculated from the today's-value amount you entered, adjusted using the same inflation rate as your expenses.",
+    "pensionSufficient": "Your expected pension is already sufficient to cover your expenses — no additional corpus is needed."
+  },
+  "common": {
+    "baht": "THB",
+    "years": "years",
+    "months": "months",
+    "percent": "%",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up",
+      "forgotPassword": "Forgot password?",
+      "googleButton": "Log in with Google",
+      "orDivider": "or"
+    },
+    "register": {
+      "title": "Sign up",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Sign up",
+      "submitting": "Signing up...",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "We've sent a confirmation link to your email. Please confirm before logging in.",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter the email you signed up with and we'll send you a password reset link.",
+      "email": "Email",
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "sentTitle": "Link sent",
+      "sentBody": "Check your email to reset your password.",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "newPassword": "New password",
+      "submit": "Save new password",
+      "submitting": "Saving...",
+      "success": "Your password has been reset."
+    },
+    "signOut": "Log out",
+    "errors": {
+      "invalidCredentials": "Incorrect email or password",
+      "emailNotConfirmed": "Please confirm your email before logging in",
+      "emailTaken": "This email is already registered",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "rateLimited": "Too many attempts. Please wait and try again",
+      "invalidEmail": "Invalid email format",
+      "generic": "Something went wrong. Please try again"
+    }
+  },
+  "dashboard": {
+    "title": "My plans",
+    "newPlan": "Create new plan",
+    "lastEdited": "Last edited",
+    "targetCorpus": "Target corpus",
+    "statusOnTrack": "On track",
+    "statusGap": "Short by {amount}",
+    "empty": {
+      "title": "No retirement plans yet",
+      "description": "Start planning your retirement today",
+      "cta": "Create your first plan"
+    },
+    "menu": {
+      "open": "Open",
+      "duplicate": "Duplicate",
+      "rename": "Rename",
+      "delete": "Delete"
+    },
+    "renameDialog": {
+      "title": "Rename plan",
+      "label": "Plan name"
+    },
+    "deleteDialog": {
+      "title": "Delete this plan?",
+      "body": "This action cannot be undone.",
+      "confirm": "Delete plan"
+    }
+  },
+  "planDetail": {
+    "edit": "Edit plan",
+    "rename": "Rename plan",
+    "delete": "Delete plan",
+    "print": "Print",
+    "backToDashboard": "Back to my plans",
+    "saveAndView": "Save plan",
+    "saving": "Saving..."
+  },
+  "learn": {
+    "hub": {
+      "title": "Financial knowledge",
+      "subtitle": "The financial basics worth knowing before you plan for retirement, explained without unexplained jargon.",
+      "readArticle": "Read article"
+    },
+    "article": {
+      "backToHub": "Back to financial knowledge",
+      "ctaDescription": "Now that you understand the principle, try applying it to your own numbers.",
+      "cta": "Try calculating your plan"
+    },
+    "compoundInterestChart": {
+      "title": "Try adjusting the numbers",
+      "tabGrowth": "Compound vs. simple (30 years)",
+      "tabStartEarly": "Start at 25 vs. 35",
+      "principal": "Starting principal (THB)",
+      "annualRate": "Annual rate of return (%)",
+      "monthlyContribution": "Monthly saving (THB)",
+      "compoundLine": "Compound interest",
+      "simpleLine": "Simple interest",
+      "yearsLabel": "Year",
+      "startAt25": "Starting at age 25",
+      "startAt35": "Starting at age 35",
+      "totalContributed25": "Total principal saved",
+      "totalContributed35": "Total principal saved",
+      "costOfWaiting": "Waiting 10 years to start costs this much at age 65"
+    },
+    "riskProfileTable": {
+      "riskLevel": "Risk level",
+      "expectedReturn": "Expected annual return",
+      "bondsAndDeposits": "Bonds/deposits",
+      "stocks": "Stocks"
+    }
+  }
+}

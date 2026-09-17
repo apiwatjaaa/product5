@@ -1,0 +1,45 @@
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
+import { SignOutButton } from "@/components/layout/sign-out-button";
+import { ModeToggle } from "@/components/layout/mode-toggle";
+
+export async function Navbar() {
+  const t = await getTranslations();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return (
+    <header className="border-b print:hidden">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2">
+        <Link href="/" className="font-semibold">
+          {t("brand.name")}
+        </Link>
+        <nav className="flex flex-wrap items-center gap-1">
+          <Button variant="ghost" size="sm" render={<Link href="/learn" />}>
+            {t("nav.learn")}
+          </Button>
+          <Button variant="ghost" size="sm" render={<Link href="/plan/new" />}>
+            {t("nav.planNew")}
+          </Button>
+          {user ? (
+            <>
+              <Button variant="ghost" size="sm" render={<Link href="/dashboard" />}>
+                {t("nav.dashboard")}
+              </Button>
+              <SignOutButton />
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" render={<Link href="/login" />}>
+              {t("nav.login")}
+            </Button>
+          )}
+          <ModeToggle />
+        </nav>
+      </div>
+    </header>
+  );
+}
