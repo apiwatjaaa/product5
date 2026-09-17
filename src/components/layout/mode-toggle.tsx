@@ -27,6 +27,7 @@ export function ModeToggle() {
       size="icon"
       aria-label={t(isDark ? "switchToLight" : "switchToDark")}
       onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="[&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:rotate-45"
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
     </Button>

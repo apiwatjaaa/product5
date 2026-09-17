@@ -2,6 +2,7 @@
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useTranslations } from "next-intl";
+import { chartTooltipContentStyle, chartTooltipItemStyle } from "@/lib/chart-tooltip-style";
 
 export function PortfolioPie({
   allocation,
@@ -25,7 +26,11 @@ export function PortfolioPie({
               <Cell key={entry.key} fill={colors[index % colors.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => `${(Number(value) * 100).toFixed(0)}%`} />
+          <Tooltip
+            formatter={(value) => `${(Number(value) * 100).toFixed(0)}%`}
+            contentStyle={chartTooltipContentStyle}
+            itemStyle={chartTooltipItemStyle}
+          />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

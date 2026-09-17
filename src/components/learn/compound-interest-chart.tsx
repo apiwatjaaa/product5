@@ -20,6 +20,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { futureValue, futureValueAnnuity } from "@/lib/finance/tvm";
 import { formatCompact, formatCurrency } from "@/lib/format";
+import {
+  chartTooltipContentStyle,
+  chartTooltipItemStyle,
+  chartTooltipLabelStyle,
+} from "@/lib/chart-tooltip-style";
 
 const GROWTH_YEARS = 30;
 const RETIREMENT_AGE = 65;
@@ -125,6 +130,9 @@ export function CompoundInterestChart() {
                   <Tooltip
                     formatter={(value, name) => [formatCurrency(Number(value), locale), String(name)]}
                     labelFormatter={(year) => `${t("yearsLabel")} ${year}`}
+                    contentStyle={chartTooltipContentStyle}
+                    labelStyle={chartTooltipLabelStyle}
+                    itemStyle={chartTooltipItemStyle}
                   />
                   <Legend />
                   <Line

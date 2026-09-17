@@ -15,6 +15,11 @@ import {
 } from "recharts";
 import { useLocale, useTranslations } from "next-intl";
 import { formatCompact, formatCurrency } from "@/lib/format";
+import {
+  chartTooltipContentStyle,
+  chartTooltipItemStyle,
+  chartTooltipLabelStyle,
+} from "@/lib/chart-tooltip-style";
 import type { YearRow } from "@/lib/finance/types";
 
 export function GrowthChart({
@@ -52,6 +57,9 @@ export function GrowthChart({
           <Tooltip
             formatter={(value, name) => [formatCurrency(Number(value), locale), String(name)]}
             labelFormatter={(age) => `${t("title")} — ${age}`}
+            contentStyle={chartTooltipContentStyle}
+            labelStyle={chartTooltipLabelStyle}
+            itemStyle={chartTooltipItemStyle}
           />
           <Legend />
           <Area
