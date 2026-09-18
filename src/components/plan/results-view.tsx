@@ -62,19 +62,21 @@ export function ResultsView({ input }: { input: PlanInput }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
               <PiggyBank className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.corpusNeeded")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-mono text-2xl font-semibold">{formatCurrency(corpus.selected, locale)}</p>
+            <p className="font-mono text-2xl font-semibold drop-shadow-[0_0_14px_var(--glow)]">
+              {formatCurrency(corpus.selected, locale)}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
               <Wallet className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.requiredMonthly")}
             </CardTitle>
@@ -91,7 +93,7 @@ export function ResultsView({ input }: { input: PlanInput }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
               <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
               {t("results.summary.expenseAtRetirement")}
             </CardTitle>

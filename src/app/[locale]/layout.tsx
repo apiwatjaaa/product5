@@ -25,7 +25,7 @@ const fontMono = IBM_Plex_Mono({
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#171a21" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0d14" },
   ],
 };
 
@@ -66,7 +66,7 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <TooltipProvider>
               <Navbar />
               {children}

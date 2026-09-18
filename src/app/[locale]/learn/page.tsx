@@ -26,9 +26,12 @@ export default async function LearnHubPage({
             <Link
               key={article.slug}
               href={`/learn/${article.slug}`}
-              className="group flex items-start gap-4 py-5 hover:bg-muted/40"
+              className="group flex items-start gap-4 border-l-2 border-transparent py-5 pl-3 transition-colors hover:bg-accent/40 hover:border-primary"
             >
-              <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+              <Icon
+                className="mt-0.5 size-5 shrink-0 text-primary drop-shadow-[0_0_6px_var(--glow)]"
+                aria-hidden="true"
+              />
               <div className="flex-1">
                 <h2 className="font-semibold">{isTh ? article.titleTh : article.titleEn}</h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">

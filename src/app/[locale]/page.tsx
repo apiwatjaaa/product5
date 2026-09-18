@@ -48,8 +48,11 @@ export default async function HomePage() {
         {features.map((feature) => {
           const Icon = feature.icon;
           const row = (
-            <div className="flex gap-4 py-6">
-              <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+            <div className="flex gap-4 border-l-2 border-transparent py-6 pl-3 transition-colors group-hover:border-primary">
+              <Icon
+                className="mt-0.5 size-5 shrink-0 text-primary drop-shadow-[0_0_6px_var(--glow)]"
+                aria-hidden="true"
+              />
               <div>
                 <h2 className="font-semibold">{feature.title}</h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">{feature.description}</p>
@@ -57,7 +60,7 @@ export default async function HomePage() {
             </div>
           );
           return "href" in feature ? (
-            <Link key={feature.title} href={feature.href} className="block hover:bg-muted/40">
+            <Link key={feature.title} href={feature.href} className="group block hover:bg-accent/40">
               {row}
             </Link>
           ) : (
