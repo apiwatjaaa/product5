@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/supabase/auth-errors";
-import { getSiteUrl } from "@/lib/supabase/redirect-url";
+import { getCallbackUrl } from "@/lib/supabase/redirect-url";
 import { forgotPasswordSchema, type ForgotPasswordValues } from "@/lib/validation/authSchema";
 
 export default function ForgotPasswordPage() {
@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
     setIsSubmitting(true);
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${getSiteUrl()}/${locale}/reset-password`,
+      redirectTo: getCallbackUrl(locale, "/reset-password"),
     });
     setIsSubmitting(false);
 

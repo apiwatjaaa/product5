@@ -212,7 +212,11 @@
       "newPassword": "New password",
       "submit": "Save new password",
       "submitting": "Saving...",
-      "success": "Your password has been reset."
+      "success": "Your password has been reset.",
+      "checking": "Checking your link...",
+      "invalidLinkTitle": "Link expired or invalid",
+      "invalidLinkBody": "This password reset link is single-use and expires shortly after it's sent. Please request a new one.",
+      "requestNewLink": "Request a new link"
     },
     "signOut": "Log out",
     "errors": {

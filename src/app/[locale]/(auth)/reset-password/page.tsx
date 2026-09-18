@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export default function ResetPasswordPage() {
   const tErrors = useTranslations("auth.errors");
   const router = useRouter();
 
+  const [sessionState, setSessionState] = useState<"checking" | "valid" | "invalid">("checking");
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -29,6 +30,13 @@ export default function ResetPasswordPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<ResetPasswordValues>({ resolver: zodResolver(resetPasswordSchema) });
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data, error }) => {
+      setSessionState(error || !data.user ? "invalid" : "valid");
+    });
+  }, []);
 
   const onSubmit = async (data: ResetPasswordValues) => {
     setServerError(null);
@@ -44,6 +52,28 @@ export default function ResetPasswordPage() {
     setSuccess(true);
     setTimeout(() => router.push("/dashboard"), 1500);
   };
+
+  if (sessionState === "checking") {
+    return (
+      <AuthCard title={t("title")}>
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          {t("checking")}
+        </p>
+      </AuthCard>
+    );
+  }
+
+  if (sessionState === "invalid") {
+    return (
+      <AuthCard title={t("invalidLinkTitle")}>
+        <p className="text-sm text-muted-foreground">{t("invalidLinkBody")}</p>
+        <Button render={<Link href="/forgot-password" />} nativeButton={false} className="mt-4 w-full">
+          {t("requestNewLink")}
+        </Button>
+      </AuthCard>
+    );
+  }
 
   return (
     <AuthCard title={t("title")}>
