@@ -58,6 +58,7 @@ export default async function DashboardPage({
                 name={plan.name}
                 updatedAt={plan.updated_at}
                 corpusNeeded={corpus.selected}
+                projected={projected}
                 gap={gap}
               />
             );

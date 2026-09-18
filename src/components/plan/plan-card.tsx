@@ -24,12 +24,14 @@ export function PlanCard({
   name: initialName,
   updatedAt,
   corpusNeeded,
+  projected,
   gap,
 }: {
   id: string;
   name: string;
   updatedAt: string;
   corpusNeeded: number;
+  projected: number;
   gap: number;
 }) {
   const t = useTranslations();
@@ -40,6 +42,7 @@ export function PlanCard({
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const isOnTrack = gap <= 0;
+  const progress = corpusNeeded > 0 ? Math.min(1, Math.max(0, projected / corpusNeeded)) : 1;
 
   const onDuplicate = async () => {
     await duplicatePlan(id);
@@ -85,6 +88,18 @@ export function PlanCard({
         <p className="text-sm">
           {t("dashboard.targetCorpus")}: <span className="font-mono font-medium">{formatCurrency(corpusNeeded, locale)}</span>
         </p>
+        <div
+          role="progressbar"
+          aria-valuenow={Math.round(progress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+        >
+          <div
+            className={`h-full rounded-full transition-[width] ${isOnTrack ? "bg-success" : "bg-primary"}`}
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
         <Badge variant={isOnTrack ? "secondary" : "destructive"} className={isOnTrack ? "bg-success/15 text-success" : undefined}>
           {isOnTrack ? t("dashboard.statusOnTrack") : t("dashboard.statusGap", { amount: formatCurrency(gap, locale) })}
         </Badge>
