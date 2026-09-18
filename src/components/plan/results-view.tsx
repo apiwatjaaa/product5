@@ -29,6 +29,7 @@ import { simulateAccumulation } from "@/lib/finance/simulate";
 import { generateSuggestions } from "@/lib/finance/recommend";
 import { RISK_PROFILES } from "@/lib/finance/constants";
 import { formatCurrency } from "@/lib/format";
+import { useCountUp } from "@/lib/use-count-up";
 import type { PlanInput } from "@/lib/finance/types";
 
 export function ResultsView({ input }: { input: PlanInput }) {
@@ -50,6 +51,10 @@ export function ResultsView({ input }: { input: PlanInput }) {
   );
   const savingIsSufficient = input.monthlyContribution >= requiredPMT;
 
+  const corpusDisplay = useCountUp(corpus.selected);
+  const requiredPmtDisplay = useCountUp(requiredPMT);
+  const expenseDisplay = useCountUp(corpus.expenseAtRetirement);
+
   return (
     <div className="space-y-8 lg:space-y-24">
       {corpus.netMonthlyNeed === 0 && (
@@ -69,8 +74,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-mono text-2xl font-semibold drop-shadow-[0_0_14px_var(--glow)]">
-              {formatCurrency(corpus.selected, locale)}
+            <p className="font-mono text-2xl font-semibold drop-shadow-[0_0_14px_var(--glow)] tabular-nums">
+              {formatCurrency(corpusDisplay, locale)}
             </p>
           </CardContent>
         </Card>
@@ -83,8 +88,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={`font-mono text-2xl font-semibold ${savingIsSufficient ? "text-success" : "text-destructive"}`}>
-              {formatCurrency(requiredPMT, locale)}
+            <p className={`font-mono text-2xl font-semibold tabular-nums ${savingIsSufficient ? "text-success" : "text-destructive"}`}>
+              {formatCurrency(requiredPmtDisplay, locale)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {t("results.summary.comparedToActual")}: {formatCurrency(input.monthlyContribution, locale)}
@@ -100,8 +105,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-mono text-2xl font-semibold">
-              {formatCurrency(corpus.expenseAtRetirement, locale)}
+            <p className="font-mono text-2xl font-semibold tabular-nums">
+              {formatCurrency(expenseDisplay, locale)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {t("results.summary.adjustedFromToday", {
