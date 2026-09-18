@@ -11,5 +11,7 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
+  // apple-icon ไม่มีนามสกุลไฟล์ใน URL (ต่างจาก icon.svg/favicon.ico) ต้อง exclude เองไม่งั้น
+  // middleware ภาษาจะดักไปเติม locale prefix แล้ว 404 เพราะ route นี้มีแค่ที่ root เท่านั้น
+  matcher: ["/((?!api|trpc|_next|_vercel|apple-icon|.*\\..*).*)"],
 };
