@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Reveal } from "@/components/reveal";
 import { GrowthChart } from "@/components/charts/growth-chart";
 import { PortfolioPie } from "@/components/charts/portfolio-pie";
 import { YearlyTable } from "@/components/plan/yearly-table";
@@ -50,7 +51,7 @@ export function ResultsView({ input }: { input: PlanInput }) {
   const savingIsSufficient = input.monthlyContribution >= requiredPMT;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 lg:space-y-24">
       {corpus.netMonthlyNeed === 0 && (
         <div className="flex items-center gap-2 rounded-lg border border-success/40 bg-success/5 p-4 text-sm font-medium text-success">
           <CheckCircle2 className="size-5 shrink-0" />
@@ -120,90 +121,102 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {gap <= 0 && <OnTrackNote excess={projected - corpus.selected} />}
 
       {/* 3. กราฟเส้นการเติบโตของเงินออม */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LineChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            {t("results.chart.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GrowthChart rows={simulation.rows} target={corpus.selected} currentAge={input.currentAge} />
-        </CardContent>
-      </Card>
+      <Reveal>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LineChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("results.chart.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <GrowthChart rows={simulation.rows} target={corpus.selected} currentAge={input.currentAge} />
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* 4. กราฟวงกลมสัดส่วนพอร์ต */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PieChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            {t("results.portfolio.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <PortfolioPie allocation={riskProfile.allocation} />
-          <div className="space-y-2 text-sm">
-            <p className="font-medium">{t(`riskLevel.${input.riskLevel}`)}</p>
-            <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-              {riskProfile.assetsTh.map((asset) => (
-                <li key={asset}>{asset}</li>
-              ))}
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+      <Reveal>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("results.portfolio.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <PortfolioPie allocation={riskProfile.allocation} />
+            <div className="space-y-2 text-sm">
+              <p className="font-medium">{t(`riskLevel.${input.riskLevel}`)}</p>
+              <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                {riskProfile.assetsTh.map((asset) => (
+                  <li key={asset}>{asset}</li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* 5. คำแนะนำการออมและการลงทุน */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            {t("results.recommend.savingTips.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
-            <li>{t("results.recommend.savingTips.payYourselfFirst")}</li>
-            <li>{t("results.recommend.savingTips.autoTransfer")}</li>
-            <li>{t("results.recommend.savingTips.reviewYearly")}</li>
-            {corpus.yearsToRetirement < 10 && (
-              <li className="flex items-start gap-1.5 text-foreground">
-                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
-                {t("results.recommend.savingTips.nearRetirement")}
-              </li>
-            )}
-          </ul>
-        </CardContent>
-      </Card>
+      <Reveal>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("results.recommend.savingTips.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
+              <li>{t("results.recommend.savingTips.payYourselfFirst")}</li>
+              <li>{t("results.recommend.savingTips.autoTransfer")}</li>
+              <li>{t("results.recommend.savingTips.reviewYearly")}</li>
+              {corpus.yearsToRetirement < 10 && (
+                <li className="flex items-start gap-1.5 text-foreground">
+                  <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
+                  {t("results.recommend.savingTips.nearRetirement")}
+                </li>
+              )}
+            </ul>
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* 6. ตารางแผนการออมรายปี */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarRange className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            {t("results.table.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <YearlyTable rows={simulation.rows} />
-        </CardContent>
-      </Card>
+      <Reveal>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarRange className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("results.table.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <YearlyTable rows={simulation.rows} />
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* 7. เปรียบเทียบ 3 วิธีคำนวณ */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Scale className="size-5 shrink-0 text-primary" aria-hidden="true" />
-            {t("results.comparison.title")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MethodComparison corpus={corpus} selectedMethod={input.corpusMethod} />
-        </CardContent>
-      </Card>
+      <Reveal>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Scale className="size-5 shrink-0 text-primary" aria-hidden="true" />
+              {t("results.comparison.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MethodComparison corpus={corpus} selectedMethod={input.corpusMethod} />
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* 8. ข้อความปฏิเสธความรับผิดชอบ */}
-      <Disclaimer />
+      <Reveal>
+        <Disclaimer />
+      </Reveal>
     </div>
   );
 }

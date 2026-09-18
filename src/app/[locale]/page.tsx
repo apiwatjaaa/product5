@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/reveal";
 
 export default async function HomePage() {
   const t = await getTranslations();
@@ -28,7 +29,7 @@ export default async function HomePage() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-3xl px-4 pt-16 pb-10 sm:pt-24">
+      <div className="mx-auto w-full max-w-3xl px-4 pt-16 pb-10 sm:pt-24 lg:pb-24">
         <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
           {t("brand.school")}
         </p>
@@ -45,7 +46,7 @@ export default async function HomePage() {
       </div>
 
       <div className="mx-auto w-full max-w-3xl divide-y border-t px-4">
-        {features.map((feature) => {
+        {features.map((feature, index) => {
           const Icon = feature.icon;
           const row = (
             <div className="flex gap-4 border-l-2 border-transparent py-6 pl-3 transition-colors group-hover:border-primary">
@@ -59,12 +60,16 @@ export default async function HomePage() {
               </div>
             </div>
           );
-          return "href" in feature ? (
-            <Link key={feature.title} href={feature.href} className="group block hover:bg-accent/40">
-              {row}
-            </Link>
-          ) : (
-            <div key={feature.title}>{row}</div>
+          return (
+            <Reveal key={feature.title} delayMs={index * 80}>
+              {"href" in feature ? (
+                <Link href={feature.href} className="group block hover:bg-accent/40">
+                  {row}
+                </Link>
+              ) : (
+                row
+              )}
+            </Reveal>
           );
         })}
       </div>

@@ -34,9 +34,11 @@ export default async function PlanEditPage({
   const values = rowToPlanFormValues(plan, plan.plan_goals ?? []);
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
-      <h1 className="mb-1 text-2xl font-bold tracking-tight sm:text-3xl">{plan.name}</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{t("subtitle")}</p>
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 lg:py-16">
+      <div className="mb-8 lg:mb-24">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{plan.name}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+      </div>
       <PlanForm isAuthenticated planId={plan.id} initialValues={values} initialName={plan.name} />
     </main>
   );
