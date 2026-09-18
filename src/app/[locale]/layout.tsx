@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import "../globals.css";
 
@@ -53,6 +54,7 @@ export default async function LocaleLayout({
             <TooltipProvider>
               <Navbar />
               {children}
+              <Footer />
             </TooltipProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
