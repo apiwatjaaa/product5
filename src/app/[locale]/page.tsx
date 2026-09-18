@@ -34,7 +34,7 @@ export default async function HomePage() {
           className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,var(--color-accent),transparent)]"
           aria-hidden="true"
         />
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-4 py-20 text-center sm:py-28">
+        <div className="mx-auto flex max-w-2xl animate-in flex-col items-center gap-6 px-4 py-20 fade-in slide-in-from-bottom-3 duration-700 text-center sm:py-28">
           <span className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
             <PiggyBank className="size-3.5 text-primary" aria-hidden="true" />
             {t("brand.school")}
@@ -58,10 +58,14 @@ export default async function HomePage() {
       </div>
 
       <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 px-4 pb-20 sm:grid-cols-3">
-        {features.map((feature) => {
+        {features.map((feature, index) => {
           const Icon = feature.icon;
+          const style = { animationDelay: `${150 + index * 100}ms`, animationFillMode: "backwards" as const };
           const card = (
-            <Card className="h-full transition-shadow hover:shadow-md">
+            <Card
+              className="h-full animate-in fade-in slide-in-from-bottom-2 duration-700 transition-shadow hover:shadow-md"
+              style={style}
+            >
               <CardHeader>
                 <div className="mb-1 flex size-10 items-center justify-center rounded-lg bg-accent text-primary">
                   <Icon className="size-5" aria-hidden="true" />
