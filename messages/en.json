@@ -226,6 +226,7 @@
       "passwordTooShort": "Password must be at least 6 characters",
       "rateLimited": "Too many attempts. Please wait and try again",
       "invalidEmail": "Invalid email format",
+      "linkExpired": "This link has expired or was already used. Please request a new one.",
       "generic": "Something went wrong. Please try again"
     }
   },

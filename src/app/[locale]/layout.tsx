@@ -5,9 +5,11 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthHashErrorHandler } from "@/components/auth/auth-hash-error-handler";
 import "../globals.css";
 
 const fontSans = IBM_Plex_Sans_Thai({
@@ -68,9 +70,11 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <TooltipProvider>
+              <AuthHashErrorHandler />
               <Navbar />
               {children}
               <Footer />
+              <Toaster />
             </TooltipProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
