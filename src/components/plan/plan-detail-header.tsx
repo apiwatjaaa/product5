@@ -16,7 +16,7 @@ export function PlanDetailHeader({ planId, initialName }: { planId: string; init
 
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
-      <h1 className="text-2xl font-semibold sm:text-3xl">{name}</h1>
+      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{name}</h1>
       <div className="flex flex-wrap gap-2">
         <Button
           render={<Link href={`/plan/${planId}/edit`} />}

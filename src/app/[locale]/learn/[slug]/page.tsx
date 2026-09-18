@@ -41,10 +41,8 @@ export default async function LearnArticlePage({
         <ArrowLeft className="size-4" /> {t("backToHub")}
       </Button>
 
-      <div className="mb-3 flex size-11 items-center justify-center rounded-lg bg-accent text-primary">
-        <Icon className="size-5" aria-hidden="true" />
-      </div>
-      <h1 className="text-2xl font-semibold text-balance sm:text-3xl">
+      <h1 className="flex items-center gap-2.5 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+        <Icon className="size-6 shrink-0 text-primary" aria-hidden="true" />
         {isTh ? article.titleTh : article.titleEn}
       </h1>
       <p className="mt-2 text-muted-foreground">{isTh ? article.summaryTh : article.summaryEn}</p>

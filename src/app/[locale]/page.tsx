@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function HomePage() {
   const t = await getTranslations();
@@ -29,60 +28,40 @@ export default async function HomePage() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,var(--color-accent),transparent)]"
-          aria-hidden="true"
-        />
-        <div className="mx-auto flex max-w-2xl animate-in flex-col items-center gap-6 px-4 py-20 fade-in slide-in-from-bottom-3 duration-700 text-center sm:py-28">
-          <span className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
-            <PiggyBank className="size-3.5 text-primary" aria-hidden="true" />
-            {t("brand.school")}
-          </span>
-          <h1 className="max-w-2xl text-3xl font-semibold text-balance sm:text-5xl">
-            {t("landing.heroTitle")}
-          </h1>
-          <p className="max-w-xl text-balance text-muted-foreground sm:text-lg">
-            {t("landing.heroSubtitle")}
-          </p>
-          <Button
-            render={<Link href="/plan/new" />}
-            nativeButton={false}
-            size="lg"
-            className="mt-2"
-          >
-            {t("landing.cta")}
-            <ArrowRight className="size-4" />
-          </Button>
-        </div>
+      <div className="mx-auto w-full max-w-3xl px-4 pt-16 pb-10 sm:pt-24">
+        <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+          {t("brand.school")}
+        </p>
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-balance sm:text-6xl">
+          {t("landing.heroTitle")}
+        </h1>
+        <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
+          {t("landing.heroSubtitle")}
+        </p>
+        <Button render={<Link href="/plan/new" />} nativeButton={false} size="lg" className="mt-6">
+          {t("landing.cta")}
+          <ArrowRight className="size-4" />
+        </Button>
       </div>
 
-      <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 px-4 pb-20 sm:grid-cols-3">
-        {features.map((feature, index) => {
+      <div className="mx-auto w-full max-w-3xl divide-y border-t px-4">
+        {features.map((feature) => {
           const Icon = feature.icon;
-          const style = { animationDelay: `${150 + index * 100}ms`, animationFillMode: "backwards" as const };
-          const card = (
-            <Card
-              className="h-full animate-in fade-in slide-in-from-bottom-2 duration-700 transition-shadow hover:shadow-md"
-              style={style}
-            >
-              <CardHeader>
-                <div className="mb-1 flex size-10 items-center justify-center rounded-lg bg-accent text-primary">
-                  <Icon className="size-5" aria-hidden="true" />
-                </div>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
-              </CardHeader>
-            </Card>
+          const row = (
+            <div className="flex gap-4 py-6">
+              <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+              <div>
+                <h2 className="font-semibold">{feature.title}</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            </div>
           );
           return "href" in feature ? (
-            <Link key={feature.title} href={feature.href} className="block h-full">
-              {card}
+            <Link key={feature.title} href={feature.href} className="block hover:bg-muted/40">
+              {row}
             </Link>
           ) : (
-            <div key={feature.title} className="h-full">
-              {card}
-            </div>
+            <div key={feature.title}>{row}</div>
           );
         })}
       </div>
