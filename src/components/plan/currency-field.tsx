@@ -17,11 +17,13 @@ export function CurrencyField({
   value,
   onChange,
   id,
+  ariaLabel,
   ariaDescribedBy,
 }: {
   value: number;
   onChange: (value: number) => void;
   id?: string;
+  ariaLabel?: string;
   ariaDescribedBy?: string;
 }) {
   const [text, setText] = useState(formatThousands(value));
@@ -34,6 +36,7 @@ export function CurrencyField({
     <Input
       id={id}
       inputMode="numeric"
+      aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
       value={text}
       onChange={(e) => {

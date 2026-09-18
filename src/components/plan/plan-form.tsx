@@ -311,15 +311,18 @@ export function PlanForm({
               {fields.map((field, index) => (
                 <div key={field.id} className="grid grid-cols-1 gap-2 rounded-md border p-3 sm:grid-cols-[2fr_1fr_1fr_auto]">
                   <Input
+                    aria-label={t("planForm.goalsCard.namePlaceholder")}
                     placeholder={t("planForm.goalsCard.namePlaceholder")}
                     {...register(`goals.${index}.name` as const)}
                   />
                   <CurrencyField
+                    ariaLabel={t("planForm.goalsCard.amountPlaceholder")}
                     value={values.goals?.[index]?.amountToday ?? 0}
                     onChange={(v) => setValue(`goals.${index}.amountToday`, v, { shouldValidate: true })}
                   />
                   <Input
                     type="number"
+                    aria-label={t("planForm.goalsCard.targetAgePlaceholder")}
                     placeholder={t("planForm.goalsCard.targetAgePlaceholder")}
                     {...register(`goals.${index}.targetAge` as const, { valueAsNumber: true })}
                   />
