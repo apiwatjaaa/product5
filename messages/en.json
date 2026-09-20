@@ -14,6 +14,11 @@
     "switchToLight": "Switch to light theme",
     "switchToDark": "Switch to dark theme"
   },
+  "locale": {
+    "toggle": "Change language",
+    "th": "ไทย",
+    "en": "English"
+  },
   "landing": {
     "heroTitle": "Know how much you need before you can retire comfortably",
     "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that fully accounts for inflation.",
