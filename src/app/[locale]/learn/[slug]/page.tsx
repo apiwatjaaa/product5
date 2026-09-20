@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ARTICLE_ICONS } from "@/components/learn/article-icons";
-import { CompoundInterestChart } from "@/components/learn/compound-interest-chart";
+import { LEARN_CALCULATORS } from "@/components/learn/learn-calculators";
 import { RiskProfileTable } from "@/components/learn/risk-profile-table";
 import { LEARN_ARTICLES, getLearnArticle } from "@/lib/learn/articles";
 
@@ -28,6 +28,7 @@ export default async function LearnArticlePage({
   const t = await getTranslations("learn.article");
   const isTh = locale === "th";
   const Icon = ARTICLE_ICONS[article.slug];
+  const Calculator = LEARN_CALCULATORS[article.slug];
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -66,11 +67,9 @@ export default async function LearnArticlePage({
         ))}
       </div>
 
-      {article.interactive && (
-        <div className="mt-8">
-          <CompoundInterestChart />
-        </div>
-      )}
+      <div className="mt-8">
+        <Calculator />
+      </div>
 
       <Card className="mt-10">
         <CardContent className="flex flex-col items-center gap-3 py-8 text-center">

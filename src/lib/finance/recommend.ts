@@ -5,6 +5,7 @@ import { RISK_LEVEL_ORDER, RISK_PROFILES } from './constants';
 import {
   calculateCorpus,
   calculateGap,
+  calculateProjectedSavingsBreakdown,
   getProjectedSavings,
   requiredMonthlyContribution,
 } from './corpus';
@@ -64,14 +65,24 @@ export function generateSuggestions(input: PlanInput): Suggestion[] {
 
   const suggestions: Suggestion[] = [];
 
-  const monthlyRate = input.annualReturn / 12;
+  // เงินเพิ่มที่ต้องออมจะเข้าเงินลงทุน (ผลตอบแทนสูงกว่า) เงินฝากคงเดิมตามแผน
+  const investmentMonthlyRate = input.annualReturn / 12;
   const months = (input.retirementAge - input.currentAge) * 12;
-  const requiredPMT = requiredMonthlyContribution(corpus.selected, input.currentSavings, monthlyRate, months);
+  const { deposit: fvDeposit } = calculateProjectedSavingsBreakdown(input);
+  const requiredInvestmentPMT = requiredMonthlyContribution(
+    corpus.selected,
+    input.currentSavingsInvestment,
+    investmentMonthlyRate,
+    months,
+    fvDeposit,
+  );
+  const requiredPMT = input.monthlyDeposit + requiredInvestmentPMT;
+  const currentTotalPMT = input.monthlyDeposit + input.monthlyInvestment;
   suggestions.push({
     type: 'increase_saving',
     severity: 'danger',
     titleKey: 'recommend.increaseSaving',
-    values: { requiredMonthly: requiredPMT, increase: requiredPMT - input.monthlyContribution },
+    values: { requiredMonthly: requiredPMT, increase: requiredPMT - currentTotalPMT },
   });
 
   const delay = findDelayRetirementAge(input);

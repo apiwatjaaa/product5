@@ -36,7 +36,10 @@ export default function LoginPage() {
     setServerError(null);
     setIsSubmitting(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
     setIsSubmitting(false);
 
     if (error) {
@@ -54,7 +57,7 @@ export default function LoginPage() {
           <Label htmlFor="email">{t("email")}</Label>
           <Input id="email" type="email" autoComplete="email" {...register("email")} />
           {errors.email?.message && (
-            <p className="text-xs text-destructive">{tErrors(errors.email.message as "invalidEmail")}</p>
+            <p className="text-xs text-destructive">{tErrors(errors.email.message as "invalidCredentials")}</p>
           )}
         </div>
         <div className="space-y-1.5">
@@ -68,12 +71,6 @@ export default function LoginPage() {
           {isSubmitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
           {isSubmitting ? t("submitting") : t("submit")}
         </Button>
-
-        <p className="text-right text-sm">
-          <Link href="/forgot-password" className="text-muted-foreground hover:underline">
-            {t("forgotPassword")}
-          </Link>
-        </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

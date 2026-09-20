@@ -33,15 +33,32 @@ export function calculateCorpus(input: PlanInput): CorpusResult {
   };
 }
 
-/** เงินที่คาดว่าจะมี ณ วันเกษียณ ด้วยสูตรปิด (ไม่มีเป้าหมายพิเศษ และไม่เพิ่มเงินออมรายปี) */
+/**
+ * เงินที่คาดว่าจะมี ณ วันเกษียณ ด้วยสูตรปิด (ไม่มีเป้าหมายพิเศษ และไม่เพิ่มเงินออมรายปี)
+ * คำนวณเงินฝากและเงินลงทุนแยกกันคนละอัตราผลตอบแทน แล้วค่อยรวมกันตอนท้าย
+ */
 export function calculateProjectedSavings(input: PlanInput): number {
+  const { deposit, investment } = calculateProjectedSavingsBreakdown(input);
+  return deposit + investment;
+}
+
+/** เหมือน calculateProjectedSavings แต่คืนค่าแยกเงินฝากกับเงินลงทุน สำหรับใช้คำนวณเงินที่ต้องออมเพิ่ม */
+export function calculateProjectedSavingsBreakdown(input: PlanInput): {
+  deposit: number;
+  investment: number;
+} {
   const monthsToRetirement = (input.retirementAge - input.currentAge) * 12;
-  const monthlyRate = input.annualReturn / 12;
+  const depositMonthlyRate = input.depositReturn / 12;
+  const investmentMonthlyRate = input.annualReturn / 12;
 
-  const fvCurrentSavings = futureValue(input.currentSavings, monthlyRate, monthsToRetirement);
-  const fvContributions = futureValueAnnuity(input.monthlyContribution, monthlyRate, monthsToRetirement);
+  const deposit =
+    futureValue(input.currentSavingsDeposit, depositMonthlyRate, monthsToRetirement) +
+    futureValueAnnuity(input.monthlyDeposit, depositMonthlyRate, monthsToRetirement);
+  const investment =
+    futureValue(input.currentSavingsInvestment, investmentMonthlyRate, monthsToRetirement) +
+    futureValueAnnuity(input.monthlyInvestment, investmentMonthlyRate, monthsToRetirement);
 
-  return fvCurrentSavings + fvContributions;
+  return { deposit, investment };
 }
 
 /** เงินที่คาดว่าจะมี ณ วันเกษียณ — ใช้สูตรปิดถ้าเป็นกรณีพื้นฐาน หรือจำลองรายปีถ้ามีเป้าหมายพิเศษ/เพิ่มเงินออมรายปี */
@@ -53,15 +70,19 @@ export function getProjectedSavings(input: PlanInput): number {
   return calculateProjectedSavings(input);
 }
 
-/** เงินที่ต้องออมต่อเดือนเพื่อให้ถึงเป้า */
+/**
+ * เงินที่ต้องออมต่อเดือนเพื่อให้ถึงเป้า
+ * `fvOtherPot` คือมูลค่าอนาคตของอีกก้อนที่คำนวณแยกไว้แล้ว (ค่าเริ่มต้น 0 สำหรับกรณีก้อนเดียว)
+ */
 export function requiredMonthlyContribution(
   corpus: number,
   currentSavings: number,
   monthlyRate: number,
   months: number,
+  fvOtherPot = 0,
 ): number {
   const fvSavings = futureValue(currentSavings, monthlyRate, months);
-  const need = corpus - fvSavings;
+  const need = corpus - fvOtherPot - fvSavings;
   if (need <= 0) return 0;
   if (Math.abs(monthlyRate) < 1e-9) return need / months;
   return (need * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);

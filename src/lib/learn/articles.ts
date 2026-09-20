@@ -23,7 +23,6 @@ export interface LearnArticle {
   summaryTh: string;
   summaryEn: string;
   sections: LearnSection[];
-  interactive?: boolean;
 }
 
 export const LEARN_ARTICLES: LearnArticle[] = [
@@ -66,7 +65,6 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     titleEn: "Compound Interest",
     summaryTh: "เครื่องมือทรงพลังที่สุดในการออมระยะยาว และทำไมการเริ่มออมเร็วถึงสำคัญกว่าที่คิด",
     summaryEn: "The most powerful tool in long-term saving, and why starting early matters more than you think.",
-    interactive: true,
     sections: [
       {
         headingTh: "ดอกเบี้ยทบต้น vs ดอกเบี้ยธรรมดา",

@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "My Retirement Plan",
-    "school": "Sukonthiravit School"
+    "school": "Sukhondheerawidh School"
   },
   "nav": {
     "planNew": "Start calculating",
@@ -16,8 +16,35 @@
   },
   "landing": {
     "heroTitle": "Know how much you need before you can retire comfortably",
-    "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that accounts for inflation and investment returns.",
+    "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that fully accounts for inflation.",
     "cta": "Start calculating for free",
+    "secondaryCta": "See how it works",
+    "badges": {
+      "noEmail": "Start right after signup — no email verification needed",
+      "free": "Completely free to use",
+      "formulaBased": "Calculated with standard financial formulas"
+    },
+    "preview": {
+      "label": "Example result",
+      "caption": "Calculated from example data, not your own result"
+    },
+    "howItWorks": {
+      "title": "Get started in 3 simple steps",
+      "steps": {
+        "one": {
+          "title": "Enter your basics",
+          "description": "Age, expenses, and current savings — takes less than 2 minutes"
+        },
+        "two": {
+          "title": "See instant results",
+          "description": "Know right away how big a nest egg you need, and how much you're short each month"
+        },
+        "three": {
+          "title": "Adjust anytime",
+          "description": "Change your retirement age, risk level, or special goals and see updated results instantly"
+        }
+      }
+    },
     "features": {
       "calculate": {
         "title": "Calculate the corpus you need",
@@ -25,7 +52,7 @@
       },
       "track": {
         "title": "See your savings grow",
-        "description": "Charts and a year-by-year table that already account for inflation and investment returns, no manual math required."
+        "description": "Charts and a year-by-year table that already account for inflation, no manual math required."
       },
       "learn": {
         "title": "Learn the financial basics",
@@ -43,6 +70,11 @@
     "simple": "Simple (ignores post-retirement returns)",
     "rule4": "4% rule"
   },
+  "corpusMethodDescription": {
+    "annuity": "Accounts for post-retirement investment returns too — most accurate",
+    "simple": "Straight multiplication, ignores post-retirement returns — easiest to understand",
+    "rule4": "Withdraw 4% of the corpus every year"
+  },
   "planForm": {
     "title": "Fill in your details to plan for retirement",
     "subtitle": "The numbers beside the form update instantly as you type",
@@ -52,8 +84,10 @@
       "retirementAge": "Target retirement age",
       "lifeExpectancy": "Life expectancy",
       "monthlyExpenseToday": "Desired monthly expense after retirement (today's value)",
-      "currentSavings": "Existing savings/investments",
-      "monthlyContribution": "Amount you can actually save per month",
+      "currentSavingsDeposit": "Existing deposits/cash savings",
+      "currentSavingsInvestment": "Existing investments",
+      "monthlyDeposit": "Bank deposit per month",
+      "monthlyInvestment": "Investment per month",
       "riskLevel": "Risk level you can tolerate"
     },
     "pensionCard": {
@@ -74,9 +108,19 @@
     "advancedCard": {
       "title": "Advanced settings",
       "inflationRate": "Annual inflation rate (%)",
-      "annualReturn": "Expected annual return (%)",
+      "annualReturn": "Expected annual investment return (%)",
+      "depositReturn": "Annual deposit return (%)",
       "contributionGrowth": "Increase savings per year (%)",
       "corpusMethod": "Corpus calculation method"
+    },
+    "helper": {
+      "ageYears": "{value} years",
+      "currencyPerMonth": "{value} THB/month",
+      "currencyTotal": "{value} THB",
+      "inflationHelper": "{value}% inflation per year — Thailand's average is roughly 2-3%",
+      "annualReturnHelper": "{value}% expected return per year, based on the risk level chosen above",
+      "depositReturnHelper": "{value}% deposit/cash return per year",
+      "contributionGrowthPerYear": "Increase savings by {value}% every year"
     },
     "livePreview": {
       "title": "Quick estimate",
@@ -113,10 +157,11 @@
     },
     "chart": {
       "title": "Savings growth over time",
-      "actualBalance": "Actual accumulated savings",
-      "contributed": "Principal contributed",
-      "target": "Target line",
-      "returnArea": "Investment returns"
+      "ageLabel": "Age {age}",
+      "principal": "Principal contributed",
+      "actualBalance": "Total accumulated savings",
+      "actualBalanceNegative": "Total accumulated savings (negative)",
+      "target": "Target line"
     },
     "portfolio": {
       "title": "Recommended portfolio allocation",
@@ -145,8 +190,9 @@
       "age": "Age",
       "monthlyContribution": "Monthly saving",
       "contributedThisYear": "Total saved this year",
-      "returnThisYear": "Return this year",
       "goalWithdrawal": "Special goal",
+      "depositBalance": "Ending deposit balance",
+      "investmentBalance": "Ending investment balance",
       "endingBalance": "Ending balance",
       "showAll": "Show all ({count} years)",
       "showLess": "Show less"
@@ -162,7 +208,11 @@
       "body": "This calculation is an estimate for educational purposes only, based on the assumptions you entered and expected rates of return that may not occur in reality. Past performance does not guarantee future returns, and investing carries the risk of losing principal. This website is not licensed investment advice. Before making real investment decisions, please consult a licensed investment advisor authorized by the Thai SEC."
     },
     "pensionAssumption": "The pension is calculated from the today's-value amount you entered, adjusted using the same inflation rate as your expenses.",
-    "pensionSufficient": "Your expected pension is already sufficient to cover your expenses — no additional corpus is needed."
+    "pensionSufficient": "Your expected pension is already sufficient to cover your expenses — no additional corpus is needed.",
+    "goalShortfall": {
+      "title": "Some special goals leave you short on funds",
+      "item": "{goalName} leaves you short — negative from age {negativeFromAge}, off by up to {shortfall} at worst; save an extra {requiredExtraMonthly}/month starting today to avoid it"
+    }
   },
   "common": {
     "baht": "THB",
@@ -171,7 +221,9 @@
     "percent": "%",
     "cancel": "Cancel",
     "save": "Save",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "decrease": "Decrease",
+    "increase": "Increase"
   },
   "auth": {
     "login": {
@@ -181,8 +233,7 @@
       "submit": "Log in",
       "submitting": "Logging in...",
       "noAccount": "Don't have an account?",
-      "registerLink": "Sign up",
-      "forgotPassword": "Forgot password?"
+      "registerLink": "Sign up"
     },
     "register": {
       "title": "Sign up",
@@ -193,40 +244,15 @@
       "submitting": "Signing up...",
       "haveAccount": "Already have an account?",
       "loginLink": "Log in",
-      "checkEmailTitle": "Check your email",
-      "checkEmailBody": "We've sent a confirmation link to your email. Please confirm before logging in.",
       "passwordMismatch": "Passwords do not match"
-    },
-    "forgotPassword": {
-      "title": "Forgot password",
-      "description": "Enter the email you signed up with and we'll send you a password reset link.",
-      "email": "Email",
-      "submit": "Send reset link",
-      "submitting": "Sending...",
-      "sentTitle": "Link sent",
-      "sentBody": "Check your email to reset your password.",
-      "backToLogin": "Back to login"
-    },
-    "resetPassword": {
-      "title": "Set a new password",
-      "newPassword": "New password",
-      "submit": "Save new password",
-      "submitting": "Saving...",
-      "success": "Your password has been reset.",
-      "checking": "Checking your link...",
-      "invalidLinkTitle": "Link expired or invalid",
-      "invalidLinkBody": "This password reset link is single-use and expires shortly after it's sent. Please request a new one.",
-      "requestNewLink": "Request a new link"
     },
     "signOut": "Log out",
     "errors": {
       "invalidCredentials": "Incorrect email or password",
-      "emailNotConfirmed": "Please confirm your email before logging in",
+      "invalidEmail": "Please enter a valid email address",
       "emailTaken": "This email is already registered",
       "passwordTooShort": "Password must be at least 6 characters",
       "rateLimited": "Too many attempts. Please wait and try again",
-      "invalidEmail": "Invalid email format",
-      "linkExpired": "This link has expired or was already used. Please request a new one.",
       "generic": "Something went wrong. Please try again"
     }
   },
@@ -293,17 +319,69 @@
       "compoundLine": "Compound interest",
       "simpleLine": "Simple interest",
       "yearsLabel": "Year",
-      "startAt25": "Starting at age 25",
-      "startAt35": "Starting at age 35",
-      "totalContributed25": "Total principal saved",
-      "totalContributed35": "Total principal saved",
-      "costOfWaiting": "Waiting 10 years to start costs this much at age 65"
+      "toggleSimple": "Compare with simple interest",
+      "startAgeEarly": "Starting age (person 1)",
+      "startAgeLate": "Starting age (person 2)",
+      "ageSuffix": "yrs",
+      "startAtAge": "Starting at age {age}",
+      "totalContributedLabel": "Total principal saved",
+      "costOfWaiting": "Waiting {years} years to start costs this much at retirement",
+      "contributionGap": "The two only differ by {amount} in total contributions, but the final gap is far larger than that"
     },
     "riskProfileTable": {
       "riskLevel": "Risk level",
       "expectedReturn": "Expected annual return",
       "bondsAndDeposits": "Bonds/deposits",
       "stocks": "Stocks"
+    },
+    "calculatorDisclaimer": {
+      "text": "This is an educational estimate only, not investment advice."
+    },
+    "tvmCalculator": {
+      "title": "Try the time value of money calculator",
+      "principal": "Amount today (THB)",
+      "years": "Number of years",
+      "yearsSuffix": "yrs",
+      "rate": "Annual return (%)",
+      "futureValue": "Future value",
+      "gained": "Amount gained",
+      "yearsLabel": "Year"
+    },
+    "inflationCalculator": {
+      "title": "Try the inflation calculator",
+      "priceToday": "Price today (THB)",
+      "pricePlaceholder": "e.g. a bowl of noodles",
+      "years": "Number of years",
+      "yearsSuffix": "yrs",
+      "inflationRate": "Annual inflation rate (%)",
+      "futurePriceLabel": "Something priced at {price} today will cost this much in {years} years",
+      "purchasingPowerLabel": "{amount} THB today will be worth this much in real terms in {years} years",
+      "documentedExample": "Textbook example: at {rate}% inflation over {years} years, {amount} THB today becomes {result} THB"
+    },
+    "realReturnCalculator": {
+      "title": "Try the real return calculator",
+      "nominalRate": "Nominal return (%)",
+      "inflationRate": "Inflation rate (%)",
+      "preset": {
+        "deposit": "Fixed deposit",
+        "bond": "Bond",
+        "stock": "Stocks"
+      },
+      "realReturn": "Real return",
+      "negativeWarning": "Your money is losing value, even though the account balance grows every year."
+    },
+    "riskReturnCalculator": {
+      "title": "Try the risk vs. return calculator",
+      "chooseRisk": "Choose a risk level",
+      "scenario": "If you invest {amount} for {years} years",
+      "worstCase": "Worst case",
+      "bestCase": "Best case",
+      "perYear": "per year",
+      "warning": "The higher the expected return, the more potential for loss you always have to accept."
+    },
+    "assetAllocationCalculator": {
+      "title": "Try adjusting the portfolio by risk level",
+      "chooseRisk": "Choose a risk level"
     }
   }
 }

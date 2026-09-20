@@ -48,36 +48,51 @@ export function YearlyTable({ rows }: { rows: YearRow[] }) {
               <TableHead>{t("year")}</TableHead>
               <TableHead className="text-right">{t("monthlyContribution")}</TableHead>
               <TableHead className="text-right">{t("contributedThisYear")}</TableHead>
-              <TableHead className="text-right">{t("returnThisYear")}</TableHead>
               <TableHead className="text-right">{t("goalWithdrawal")}</TableHead>
+              <TableHead className="text-right">{t("depositBalance")}</TableHead>
+              <TableHead className="text-right">{t("investmentBalance")}</TableHead>
               <TableHead className="text-right">{t("endingBalance")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {visibleRows.map((row) => (
-              <TableRow
-                key={row.year}
-                className={`print:break-inside-avoid ${row.goalWithdrawal > 0 ? "bg-warning/10" : ""}`}
-              >
-                <TableCell className="sticky left-0 bg-card font-mono">{row.age}</TableCell>
-                <TableCell className="font-mono">{row.year}</TableCell>
-                <TableCell className="text-right font-mono">
-                  {formatCurrency(row.monthlyContribution, locale)}
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {formatCurrency(row.contributedThisYear, locale)}
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {formatCurrency(row.returnThisYear, locale)}
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  {row.goalWithdrawal > 0 ? formatCurrency(row.goalWithdrawal, locale) : "—"}
-                </TableCell>
-                <TableCell className="text-right font-mono font-medium">
-                  {formatCurrency(row.endingBalance, locale)}
-                </TableCell>
-              </TableRow>
-            ))}
+            {visibleRows.map((row) => {
+              const isNegative = row.endingBalance < 0;
+              return (
+                <TableRow
+                  key={row.year}
+                  className={`print:break-inside-avoid ${
+                    isNegative
+                      ? "bg-destructive/10"
+                      : row.goalWithdrawal > 0
+                        ? "bg-warning/10"
+                        : ""
+                  }`}
+                >
+                  <TableCell className="sticky left-0 bg-card font-mono">{row.age}</TableCell>
+                  <TableCell className="font-mono">{row.year}</TableCell>
+                  <TableCell className="text-right font-mono">
+                    {formatCurrency(row.monthlyContribution, locale)}
+                  </TableCell>
+                  <TableCell className="text-right font-mono">
+                    {formatCurrency(row.contributedThisYear, locale)}
+                  </TableCell>
+                  <TableCell className="text-right font-mono">
+                    {row.goalWithdrawal > 0 ? formatCurrency(row.goalWithdrawal, locale) : "—"}
+                  </TableCell>
+                  <TableCell className="text-right font-mono">
+                    {formatCurrency(row.depositBalance, locale)}
+                  </TableCell>
+                  <TableCell className="text-right font-mono">
+                    {formatCurrency(row.investmentBalance, locale)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-mono font-medium ${isNegative ? "text-destructive" : ""}`}
+                  >
+                    {formatCurrency(row.endingBalance, locale)}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

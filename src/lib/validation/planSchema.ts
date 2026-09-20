@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_DEPOSIT_RETURN } from "@/lib/finance/constants";
 
 export const planGoalSchema = z.object({
   name: z.string().min(1),
@@ -12,13 +13,16 @@ export const planFormSchema = z
     retirementAge: z.number().int().min(40).max(85),
     lifeExpectancy: z.number().int().min(60).max(110),
     monthlyExpenseToday: z.number().positive(),
-    currentSavings: z.number().min(0),
-    monthlyContribution: z.number().min(0),
+    currentSavingsDeposit: z.number().min(0),
+    currentSavingsInvestment: z.number().min(0),
+    monthlyDeposit: z.number().min(0),
+    monthlyInvestment: z.number().min(0),
     riskLevel: z.enum(["conservative", "moderate", "aggressive"]),
     pensionMonthlyToday: z.number().min(0),
     goals: z.array(planGoalSchema),
     inflationRate: z.number().min(0).max(1),
     annualReturn: z.number().min(0).max(1),
+    depositReturn: z.number().min(0).max(1),
     contributionGrowth: z.number().min(0).max(1),
     corpusMethod: z.enum(["annuity", "simple", "rule4"]),
   })
@@ -46,13 +50,16 @@ export const planFormDefaults: PlanFormValues = {
   retirementAge: 60,
   lifeExpectancy: 85,
   monthlyExpenseToday: 20000,
-  currentSavings: 0,
-  monthlyContribution: 5000,
+  currentSavingsDeposit: 0,
+  currentSavingsInvestment: 0,
+  monthlyDeposit: 0,
+  monthlyInvestment: 5000,
   riskLevel: "moderate",
   pensionMonthlyToday: 0,
   goals: [],
   inflationRate: 0.03,
   annualReturn: 0.05,
+  depositReturn: DEFAULT_DEPOSIT_RETURN,
   contributionGrowth: 0,
   corpusMethod: "annuity",
 };

@@ -1,9 +1,18 @@
-// ชุดทดสอบ TC-01 ถึง TC-08 ตามสเปก (คลาดเคลื่อนได้ไม่เกิน ±1 บาท)
+// ชุดทดสอบ TC-01 ถึง TC-10 ตามสเปก (คลาดเคลื่อนได้ไม่เกิน ±1 บาท)
+// TC-01 ถึง TC-08 คือกรณีเดิมทั้งหมด ย้ายมาใช้ฟิลด์เงินฝาก/เงินลงทุนแยกกัน โดยใส่เงินก้อนเดิม
+// ทั้งหมดไว้ที่ "เงินลงทุน" (เงินฝาก = 0) ผลลัพธ์จึงต้องตรงกับตัวเลขเดิมทุกตัว
+// TC-09, TC-10 คือกรณีใหม่: แยกเงินฝาก/เงินลงทุนจริง และยอดเงินติดลบได้เมื่อเป้าหมายพิเศษดึงเงินเกิน
 
 import { describe, expect, it } from 'vitest';
-import { futureValue, futureValueAnnuity, presentValueAnnuity, realRate } from '../tvm';
-import { calculateCorpus, calculateGap, calculateProjectedSavings, getProjectedSavings, requiredMonthlyContribution } from '../corpus';
-import { simulateAccumulation } from '../simulate';
+import { futureValue, futureValueAnnuity, futureValueSimple, presentValueAnnuity, realRate } from '../tvm';
+import {
+  calculateCorpus,
+  calculateGap,
+  calculateProjectedSavings,
+  getProjectedSavings,
+  requiredMonthlyContribution,
+} from '../corpus';
+import { findGoalShortfalls, simulateAccumulation } from '../simulate';
 import { generateSuggestions } from '../recommend';
 import type { PlanInput } from '../types';
 
@@ -19,11 +28,14 @@ function basePlan(overrides: Partial<PlanInput>): PlanInput {
     retirementAge: 60,
     lifeExpectancy: 85,
     monthlyExpenseToday: 20000,
-    currentSavings: 100000,
-    monthlyContribution: 8000,
+    currentSavingsDeposit: 0,
+    currentSavingsInvestment: 100000,
+    monthlyDeposit: 0,
+    monthlyInvestment: 8000,
     riskLevel: 'moderate',
     inflationRate: 0.03,
     annualReturn: 0.05,
+    depositReturn: 0.015,
     contributionGrowth: 0,
     pensionMonthlyToday: 0,
     corpusMethod: 'annuity',
@@ -47,6 +59,17 @@ describe('tvm.ts', () => {
   it('realRate ใช้สูตร Fisher เต็ม', () => {
     expectClose(realRate(0.05, 0.03) * 100, 1.9417, 0.001);
     expect(realRate(0.03, 0.03)).toBeCloseTo(0, 9);
+  });
+
+  it('futureValueSimple คำนวณดอกเบี้ยธรรมดา (ไม่ทบต้น)', () => {
+    expect(futureValueSimple(100, 0.05, 10)).toBeCloseTo(150, 9);
+    expect(futureValueSimple(1000, 0, 20)).toBe(1000);
+  });
+
+  it('futureValueSimple ให้ผลน้อยกว่า futureValue เสมอเมื่อ n > 1 และ rate > 0', () => {
+    const simple = futureValueSimple(10000, 0.05, 30);
+    const compound = futureValue(10000, 0.05, 30);
+    expect(simple).toBeLessThan(compound);
   });
 });
 
@@ -79,7 +102,7 @@ describe('TC-01 กรณีมาตรฐาน', () => {
 
     const requiredPMT = requiredMonthlyContribution(
       corpus.byMethod.annuity,
-      input.currentSavings,
+      input.currentSavingsInvestment,
       input.annualReturn / 12,
       (input.retirementAge - input.currentAge) * 12,
     );
@@ -105,7 +128,7 @@ describe('TC-02 ผลตอบแทนเท่ากับเงินเฟ�
     expectClose(projected, 6217900.17);
     const requiredPMT = requiredMonthlyContribution(
       corpus.byMethod.annuity,
-      input.currentSavings,
+      input.currentSavingsInvestment,
       input.annualReturn / 12,
       (input.retirementAge - input.currentAge) * 12,
     );
@@ -117,8 +140,8 @@ describe('TC-03 เริ่มออมช้า ความเสี่ยง
   const input = basePlan({
     currentAge: 40,
     monthlyExpenseToday: 25000,
-    currentSavings: 500000,
-    monthlyContribution: 15000,
+    currentSavingsInvestment: 500000,
+    monthlyInvestment: 15000,
     riskLevel: 'aggressive',
     annualReturn: 0.08,
   });
@@ -149,8 +172,8 @@ describe('TC-04 มีเงินบำนาญ', () => {
   const input = basePlan({
     currentAge: 30,
     monthlyExpenseToday: 30000,
-    currentSavings: 200000,
-    monthlyContribution: 10000,
+    currentSavingsInvestment: 200000,
+    monthlyInvestment: 10000,
     pensionMonthlyToday: 6000,
   });
   const corpus = calculateCorpus(input);
@@ -168,7 +191,7 @@ describe('TC-04 มีเงินบำนาญ', () => {
 
     const requiredPMT = requiredMonthlyContribution(
       corpus.byMethod.annuity,
-      input.currentSavings,
+      input.currentSavingsInvestment,
       input.annualReturn / 12,
       (input.retirementAge - input.currentAge) * 12,
     );
@@ -180,8 +203,8 @@ describe('TC-05 อายุยืน 90 ปี (วิธี B ≠ วิธี
   const input = basePlan({
     currentAge: 30,
     lifeExpectancy: 90,
-    currentSavings: 0,
-    monthlyContribution: 10000,
+    currentSavingsInvestment: 0,
+    monthlyInvestment: 10000,
   });
   const corpus = calculateCorpus(input);
 
@@ -258,7 +281,7 @@ describe('TC-07 คำแนะนำเมื่อออมไม่ทัน�
 
 describe('TC-08 กรณีขอบที่ต้องไม่พัง', () => {
   it('เงินออมต่อเดือน = 0 คำนวณได้ปกติ แสดง gap เต็มจำนวน', () => {
-    const input = basePlan({ monthlyContribution: 0 });
+    const input = basePlan({ monthlyInvestment: 0 });
     const corpus = calculateCorpus(input);
     const projected = calculateProjectedSavings(input);
     const gap = calculateGap(corpus.byMethod.annuity, projected);
@@ -275,15 +298,14 @@ describe('TC-08 กรณีขอบที่ต้องไม่พัง', (
     expect(corpus.byMethod.rule4).toBe(0);
   });
 
-  it('เป้าหมายพิเศษมากกว่าเงินที่มี → ยอดเงินติดลบไม่ได้ ต้องเป็น 0', () => {
+  it('เป้าหมายพิเศษมากกว่าเงินที่มี → ยอดเงินติดลบได้จริง ไม่ตัดเป็น 0', () => {
     const input = basePlan({
       goals: [{ name: 'ซื้อบ้าน', amountToday: 999999999, targetAge: 26 }],
     });
     const result = simulateAccumulation(input);
     const row = result.rows.find((r) => r.age === 26);
     expect(row).toBeDefined();
-    expect(row!.endingBalance).toBe(0);
-    expect(result.rows.every((r) => r.endingBalance >= 0)).toBe(true);
+    expect(row!.endingBalance).toBeLessThan(0);
   });
 
   it('อัตราผลตอบแทน = 0 ไม่หารศูนย์', () => {
@@ -303,5 +325,143 @@ describe('TC-08 กรณีขอบที่ต้องไม่พัง', (
     const viaSimulate = simulateAccumulation(input).projectedAtRetirement;
     const viaGetProjected = getProjectedSavings(input);
     expect(viaGetProjected).toBe(viaSimulate);
+  });
+});
+
+describe('TC-09 แยกเงินฝากกับเงินลงทุนคนละอัตราผลตอบแทน', () => {
+  it('เงินฝากโตด้วย depositReturn เงินลงทุนโตด้วย annualReturn แยกกันจริง', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 31,
+      currentSavingsDeposit: 100000,
+      currentSavingsInvestment: 100000,
+      monthlyDeposit: 0,
+      monthlyInvestment: 0,
+      depositReturn: 0.015,
+      annualReturn: 0.08,
+    });
+    const result = simulateAccumulation(input);
+    const row = result.rows[0];
+    expectClose(row.depositBalance, futureValue(100000, 0.015 / 12, 12));
+    expectClose(row.investmentBalance, futureValue(100000, 0.08 / 12, 12));
+    expectClose(row.endingBalance, row.depositBalance + row.investmentBalance);
+  });
+
+  it('calculateProjectedSavings รวมสองก้อนที่คำนวณคนละอัตรากันแล้ว', () => {
+    const input = basePlan({
+      currentSavingsDeposit: 50000,
+      currentSavingsInvestment: 50000,
+      monthlyDeposit: 2000,
+      monthlyInvestment: 6000,
+    });
+    const monthsToRetirement = (input.retirementAge - input.currentAge) * 12;
+    const expectedDeposit =
+      futureValue(50000, input.depositReturn / 12, monthsToRetirement) +
+      futureValueAnnuity(2000, input.depositReturn / 12, monthsToRetirement);
+    const expectedInvestment =
+      futureValue(50000, input.annualReturn / 12, monthsToRetirement) +
+      futureValueAnnuity(6000, input.annualReturn / 12, monthsToRetirement);
+    expectClose(calculateProjectedSavings(input), expectedDeposit + expectedInvestment);
+  });
+});
+
+describe('TC-10 เป้าหมายพิเศษทำให้เงินไม่พอ (findGoalShortfalls)', () => {
+  it('ไม่มีเป้าหมายที่ทำให้ติดลบ → คืน array ว่าง', () => {
+    const input = basePlan({});
+    expect(findGoalShortfalls(input)).toHaveLength(0);
+  });
+
+  it('เป้าหมายดึงเงินเกินที่มี → รายงานเป้าหมาย ขาดเท่าไหร่ และต้องออมเพิ่มเดือนละเท่าไหร่', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 60,
+      currentSavingsDeposit: 0,
+      currentSavingsInvestment: 0,
+      monthlyDeposit: 0,
+      monthlyInvestment: 1000,
+      goals: [{ name: 'ซื้อบ้าน', amountToday: 2000000, targetAge: 35 }],
+    });
+    const shortfalls = findGoalShortfalls(input);
+    expect(shortfalls).toHaveLength(1);
+    expect(shortfalls[0].goalName).toBe('ซื้อบ้าน');
+    expect(shortfalls[0].targetAge).toBe(35);
+    expect(shortfalls[0].shortfall).toBeGreaterThan(0);
+    expect(shortfalls[0].requiredExtraMonthly).toBeGreaterThan(0);
+
+    // เพิ่มเงินลงทุนต่อเดือนตามที่แนะนำ (ทดแทนเงินเดิมทั้งหมด) แล้วต้องไม่ติดลบอีก
+    const boosted = { ...input, monthlyInvestment: input.monthlyInvestment + shortfalls[0].requiredExtraMonthly };
+    const boostedResult = simulateAccumulation(boosted);
+    const rowAtGoal = boostedResult.rows.find((r) => r.age === 35);
+    expect(rowAtGoal).toBeDefined();
+    expect(rowAtGoal!.endingBalance).toBeGreaterThanOrEqual(-1);
+  });
+
+  it('รายงาน negativeFromAge ตรงกับปีแรกที่ยอดรวมติดลบจริง (ไม่ใช่แค่ targetAge)', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 60,
+      currentSavingsDeposit: 0,
+      currentSavingsInvestment: 0,
+      monthlyDeposit: 0,
+      monthlyInvestment: 1000,
+      goals: [{ name: 'ซื้อบ้าน', amountToday: 2000000, targetAge: 35 }],
+    });
+    const shortfalls = findGoalShortfalls(input);
+    const simulation = simulateAccumulation(input);
+    const firstNegative = simulation.rows.find((r) => r.age >= 35 && r.endingBalance < 0);
+    expect(firstNegative).toBeDefined();
+    expect(shortfalls[0].negativeFromAge).toBe(firstNegative!.age);
+  });
+});
+
+describe('TC-11 ยอดติดลบต้องเป็นจริง ห้าม clamp เป็น 0', () => {
+  it('เป้าหมายดึงเงินเกินที่มี → endingBalance ติดลบได้จริง ไม่ถูกตัดเป็น 0', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 40,
+      currentSavingsDeposit: 0,
+      currentSavingsInvestment: 0,
+      monthlyDeposit: 0,
+      monthlyInvestment: 1000,
+      goals: [{ name: 'ซื้อรถ', amountToday: 5000000, targetAge: 32 }],
+    });
+    const result = simulateAccumulation(input);
+    const goalRow = result.rows.find((r) => r.age === 32)!;
+    expect(goalRow.depositBalance).toBeLessThan(0);
+    expect(goalRow.endingBalance).toBeLessThan(0);
+  });
+
+  it('ปีถัดจากที่ติดลบต้องคำนวณดอกเบี้ย/เงินสมทบต่อจากยอดติดลบนั้น ไม่ใช่เริ่มใหม่จาก 0', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 40,
+      currentSavingsDeposit: 0,
+      currentSavingsInvestment: 0,
+      monthlyDeposit: 0,
+      monthlyInvestment: 1000,
+      goals: [{ name: 'ซื้อรถ', amountToday: 5000000, targetAge: 32 }],
+    });
+    const result = simulateAccumulation(input);
+    const goalRow = result.rows.find((r) => r.age === 32)!;
+    const nextRow = result.rows.find((r) => r.age === 33)!;
+    expect(goalRow.depositBalance).toBeLessThan(0);
+    // เงินฝากปีถัดไปต้อง = ยอดติดลบเดิมคูณดอกเบี้ยต่อ (futureValue จากฐานติดลบ) ไม่ใช่เริ่มจาก 0
+    expectClose(nextRow.depositBalance, futureValue(goalRow.depositBalance, input.depositReturn / 12, 12));
+    expect(nextRow.depositBalance).toBeLessThan(goalRow.depositBalance);
+  });
+
+  it('ยอดรวมติดลบต่อเนื่องหลายปีถ้าเงินสมทบไม่พอชดเชย', () => {
+    const input = basePlan({
+      currentAge: 30,
+      retirementAge: 45,
+      currentSavingsDeposit: 0,
+      currentSavingsInvestment: 0,
+      monthlyDeposit: 0,
+      monthlyInvestment: 100,
+      goals: [{ name: 'ซื้อรถ', amountToday: 5000000, targetAge: 32 }],
+    });
+    const result = simulateAccumulation(input);
+    const rowsAfterGoal = result.rows.filter((r) => r.age >= 32 && r.age <= 40);
+    expect(rowsAfterGoal.every((r) => r.endingBalance < 0)).toBe(true);
   });
 });

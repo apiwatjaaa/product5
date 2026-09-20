@@ -124,13 +124,19 @@ create table plans (
   retirement_age         int  not null check (retirement_age between 40 and 85),
   life_expectancy        int  not null check (life_expectancy between 60 and 110),
   monthly_expense_today  numeric(14,2) not null check (monthly_expense_today > 0),
-  current_savings        numeric(14,2) not null default 0 check (current_savings >= 0),
-  monthly_contribution   numeric(14,2) not null default 0 check (monthly_contribution >= 0),
+
+  -- เงินออม แยกเป็น "เงินฝาก/เงินสด" กับ "เงินลงทุน" เพราะให้ผลตอบแทนคนละอัตรา
+  -- (ดูข้อ 5.5–5.6 — ห้ามรวมเป็นก้อนเดียวแล้วคำนวณ)
+  current_savings_deposit    numeric(14,2) not null default 0 check (current_savings_deposit >= 0),
+  current_savings_investment numeric(14,2) not null default 0 check (current_savings_investment >= 0),
+  monthly_deposit             numeric(14,2) not null default 0 check (monthly_deposit >= 0),
+  monthly_investment          numeric(14,2) not null default 0 check (monthly_investment >= 0),
   risk_level             text not null check (risk_level in ('conservative','moderate','aggressive')),
 
   -- ตั้งค่าขั้นสูง (มีค่าเริ่มต้น)
   inflation_rate         numeric(6,4) not null default 0.03,
-  annual_return          numeric(6,4) not null,   -- เติมอัตโนมัติจาก risk_level แต่แก้ได้
+  annual_return          numeric(6,4) not null,   -- ผลตอบแทนเงินลงทุน เติมอัตโนมัติจาก risk_level แต่แก้ได้
+  deposit_return          numeric(6,4) not null default 0.015,  -- ผลตอบแทนเงินฝาก แก้ได้ในตั้งค่าขั้นสูง
   contribution_growth    numeric(6,4) not null default 0,
   pension_monthly_today  numeric(14,2) not null default 0,
 
@@ -155,6 +161,8 @@ create table plan_goals (
   sort_order  int not null default 0
 );
 ```
+
+> **Migration:** สคีมาข้างต้นคือสถานะล่าสุด สร้างโปรเจกต์ใหม่ให้รัน `supabase/migrations/0001_init.sql` แล้วตามด้วย `supabase/migrations/0002_split_deposit_investment.sql` ตามลำดับใน SQL Editor โปรเจกต์ที่มีอยู่แล้ว (สร้างจาก 0001 เท่านั้น) ให้รัน 0002 เพิ่มเพื่อแยกคอลัมน์ `current_savings`/`monthly_contribution` เดิมออกเป็น 4 คอลัมน์ใหม่ (migration ย้ายข้อมูลเดิมทั้งหมดไปไว้ที่ "เงินลงทุน" โดยอัตโนมัติ)
 
 ### 4.2 Row Level Security
 
@@ -181,7 +189,7 @@ create policy "own goals" on plan_goals
 
 ### 4.3 สิ่งที่ **ไม่** เก็บ
 
-ห้ามเก็บเลขบัตรประชาชน เลขบัญชีธนาคาร หรือข้อมูลระบุตัวตนอื่นนอกจากอีเมล โครงงานนี้ไม่ต้องใช้
+ห้ามเก็บเลขบัตรประชาชน เลขบัญชีธนาคาร หรือข้อมูลระบุตัวตนอื่นใดนอกจากอีเมลที่ใช้ล็อกอิน (ดูข้อ 6.2)
 
 ---
 
@@ -350,33 +358,43 @@ export function calculateCorpus(input: PlanInput): {
 
 ส่วนนี้สร้างข้อมูลสำหรับ **ตารางรายปี** และ **กราฟเส้น** และรองรับเป้าหมายพิเศษ
 
+> ⚠️ **เงินฝากกับเงินลงทุนต้องคำนวณแยกกันเสมอ** เพราะให้ผลตอบแทนคนละอัตรา (`depositReturn` กับ `annualReturn`) ห้ามรวมเป็นยอดเดียวแล้วคูณอัตราเดียว
+
 ```ts
 export interface YearRow {
   year: number;              // 1, 2, 3, ...
   age: number;
-  monthlyContribution: number;   // ของปีนั้น
-  contributedThisYear: number;
-  returnThisYear: number;        // ผลตอบแทนที่ได้ในปีนั้น
+  monthlyContribution: number;   // รวมเงินฝาก+เงินลงทุนของปีนั้น
+  contributedThisYear: number;   // รวมทั้งสองก้อน
+  returnThisYear: number;        // ผลตอบแทนรวมที่ได้ในปีนั้น
   goalWithdrawal: number;        // เงินที่ถอนไปใช้เป้าหมายพิเศษ
-  endingBalance: number;
-  cumulativeContributed: number; // เงินต้นสะสม (เส้นที่ 2 ของกราฟ)
+  depositBalance: number;        // ยอดเงินฝากปลายปี
+  investmentBalance: number;     // ยอดเงินลงทุนปลายปี
+  endingBalance: number;         // depositBalance + investmentBalance — ติดลบได้จริง (ดูหมายเหตุด้านล่าง)
+  cumulativeContributed: number; // เงินต้นสะสมรวม (เส้นอ้างอิงในกราฟ)
 }
 ```
 
-**อัลกอริทึม** — วนทีละเดือน แต่สรุปผลทีละปี:
+**อัลกอริทึม** — วนทีละเดือน แต่สรุปผลทีละปี เงินฝากกับเงินลงทุนคนละยอดคนละอัตรา:
 
 ```
-balance = currentSavings
-pmt     = monthlyContribution
+depositBalance    = currentSavingsDeposit
+investmentBalance = currentSavingsInvestment
+depositPmt        = monthlyDeposit
+investmentPmt      = monthlyInvestment
 
 สำหรับแต่ละปี y = 1 ... yearsToRetirement:
     สำหรับแต่ละเดือน m = 1 ... 12:
-        balance = balance × (1 + monthlyRate) + pmt      // ออมปลายงวด
+        depositBalance    = depositBalance × (1 + depositMonthlyRate) + depositPmt
+        investmentBalance = investmentBalance × (1 + investmentMonthlyRate) + investmentPmt
     ถ้ามีเป้าหมายพิเศษที่ targetAge = currentAge + y:
         goalCost = amountToday × (1 + inflation) ^ y
-        balance  = max(0, balance - goalCost)
+        depositBalance = depositBalance - goalCost     // ถอนจากเงินฝาก (สภาพคล่องสูงกว่า) ก่อนเสมอ
+                                                          // ⚠️ ไม่ตัดเป็น 0 — ติดลบได้จริงถ้าเงินไม่พอ (ดูข้อ 5.9)
+    endingBalance = depositBalance + investmentBalance
     บันทึก YearRow
-    pmt = pmt × (1 + contributionGrowth)                 // ปรับขึ้นต้นปีถัดไป
+    depositPmt    = depositPmt × (1 + contributionGrowth)     // ปรับขึ้นต้นปีถัดไป
+    investmentPmt = investmentPmt × (1 + contributionGrowth)
 ```
 
 **ผลลัพธ์ที่ต้องคืน**
@@ -392,26 +410,30 @@ export function simulateAccumulation(input: PlanInput): {
 
 ### 5.6 คำนวณเงินออมที่ต้องใช้ และช่องว่าง — `lib/finance/corpus.ts`
 
-**เงินที่คาดว่าจะมี ณ วันเกษียณ** (กรณีไม่มีเป้าหมายพิเศษและไม่เพิ่มเงินออม ใช้สูตรปิดได้)
+**เงินที่คาดว่าจะมี ณ วันเกษียณ** (กรณีไม่มีเป้าหมายพิเศษและไม่เพิ่มเงินออม ใช้สูตรปิดได้ — คำนวณเงินฝากกับเงินลงทุนแยกกัน แล้วค่อยรวม)
 
 ```
-fvCurrentSavings = futureValue(currentSavings, monthlyRate, monthsToRetirement)
-fvContributions  = futureValueAnnuity(monthlyContribution, monthlyRate, monthsToRetirement)
-projected        = fvCurrentSavings + fvContributions
+fvDeposit    = futureValue(currentSavingsDeposit, depositMonthlyRate, monthsToRetirement)
+             + futureValueAnnuity(monthlyDeposit, depositMonthlyRate, monthsToRetirement)
+fvInvestment = futureValue(currentSavingsInvestment, investmentMonthlyRate, monthsToRetirement)
+             + futureValueAnnuity(monthlyInvestment, investmentMonthlyRate, monthsToRetirement)
+projected    = fvDeposit + fvInvestment
 ```
 
 > ถ้ามีเป้าหมายพิเศษหรือ `contributionGrowth > 0` ให้ใช้ค่าจาก `simulateAccumulation` แทน เพราะสูตรปิดจะไม่ตรง
 
 **เงินที่ต้องออมต่อเดือนเพื่อให้ถึงเป้า**
 
-$$PMT_{required} = \frac{(Corpus - FV_{currentSavings}) \times r}{(1+r)^n - 1}$$
+เงินที่ต้องออมเพิ่มจะเข้า **เงินลงทุน** เสมอ (ผลตอบแทนสูงกว่าเงินฝาก) ส่วนเงินฝากคงตามแผนเดิม จึงต้องหักมูลค่าอนาคตของเงินฝาก (`fvDeposit`) ออกจากเป้าหมายก่อนแก้สมการหา PMT:
+
+$$PMT_{required} = \frac{(Corpus - FV_{deposit} - FV_{currentInvestment}) \times r}{(1+r)^n - 1}$$
 
 ```ts
 export function requiredMonthlyContribution(
-  corpus: number, currentSavings: number, monthlyRate: number, months: number
+  corpus: number, currentSavings: number, monthlyRate: number, months: number, fvOtherPot = 0
 ): number {
   const fvSavings = futureValue(currentSavings, monthlyRate, months);
-  const need = corpus - fvSavings;
+  const need = corpus - fvOtherPot - fvSavings;
   if (need <= 0) return 0;                            // มีเงินพอแล้ว
   if (Math.abs(monthlyRate) < 1e-9) return need / months;
   return (need * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
@@ -426,7 +448,25 @@ gap > 0  → ออมไม่ทันเป้า
 gap <= 0 → ถึงเป้าแล้ว
 ```
 
-### 5.7 คำแนะนำ — `lib/finance/recommend.ts`
+### 5.7 ⚠️ เป้าหมายพิเศษทำให้เงินไม่พอ — ห้ามตัดยอดเป็น 0
+
+ถ้าถอนเงินไปใช้เป้าหมายพิเศษแล้วยอดรวมติดลบ **ให้แสดงค่าติดลบตามจริง** (ดู `simulateAccumulation` ข้อ 5.5) ห้ามใช้ `Math.max(0, balance)` เด็ดขาด เพราะจะซ่อนไม่ให้ผู้ใช้รู้ว่าขาดเท่าไหร่
+
+เพิ่มฟังก์ชัน `findGoalShortfalls(input): GoalShortfall[]` ใน `lib/finance/simulate.ts` เพื่อหาว่าเป้าหมายพิเศษข้อไหนทำให้ยอดรวมติดลบ โดยสำหรับแต่ละเป้าหมาย:
+
+```ts
+export interface GoalShortfall {
+  goalName: string;
+  targetAge: number;
+  negativeFromAge: number;        // ปีแรกที่ยอดรวมติดลบจริงหลังเป้าหมายนี้ (อาจมากกว่า targetAge ได้)
+  shortfall: number;              // ยอดติดลบที่ลึกที่สุดหลังเป้าหมายนี้ (มูลค่าบวก)
+  requiredExtraMonthly: number;   // ต้องออมเพิ่ม (เงินลงทุน) เดือนละเท่านี้ตั้งแต่วันนี้ถึงอายุเป้าหมาย เพื่อไม่ให้ติดลบ
+}
+```
+
+ใช้ค่าที่ติดลบมากที่สุด (`Math.min`) ของทุกปีตั้งแต่อายุเป้าหมายนั้นเป็นต้นไปเป็น `shortfall`, ปีแรกในช่วงนั้นที่ยอดรวม `< 0` เป็น `negativeFromAge`, แล้วแก้สมการ annuity หา PMT เพิ่มเติมที่ทำให้มูลค่าอนาคต ณ อายุเป้าหมายนั้นชดเชยยอดขาดพอดี ผลลัพธ์นี้ใช้แสดงในกล่องเตือนเหนือกราฟ (ข้อ 6.4)
+
+### 5.8 คำแนะนำ — `lib/finance/recommend.ts`
 
 ทุกคำแนะนำต้องเป็น **rule-based คำนวณจากตัวเลขจริง** ห้ามเขียนข้อความลอย ๆ
 
@@ -444,7 +484,7 @@ export interface Suggestion {
 | เงื่อนไข | คำแนะนำที่คืน |
 |---|---|
 | `gap <= 0` | `on_track` — "คุณออมได้ตามเป้าแล้ว" พร้อมบอกเงินส่วนเกิน |
-| `gap > 0` | `increase_saving` — ต้องออมเพิ่มเดือนละ `requiredPMT - currentPMT` บาท |
+| `gap > 0` | `increase_saving` — ต้องออมเพิ่มเดือนละ `requiredPMT - currentPMT` บาท (เงินที่เพิ่มถือว่าเข้า "เงินลงทุน" เสมอ เงินฝากคงตามแผนเดิม) |
 | `gap > 0` | `delay_retirement` — คำนวณหาอายุเกษียณที่น้อยที่สุดที่ทำให้ gap ≤ 0 โดยเพิ่มทีละ 1 ปี สูงสุด 10 ปี |
 | `gap > 0` | `reduce_expense` — คำนวณรายจ่ายต่อเดือนสูงสุดที่เงินออมปัจจุบันรองรับได้ (แก้สมการย้อนกลับ) |
 | `gap > 0` และ `riskLevel !== 'aggressive'` | `increase_risk` — แสดงว่าถ้าขยับไประดับถัดไป gap จะเหลือเท่าไหร่ **พร้อมเตือนว่าความเสี่ยงขาดทุนสูงขึ้นด้วย** |
@@ -456,7 +496,7 @@ export interface Suggestion {
 - หลักการออม: ออมก่อนใช้ (Pay Yourself First), ตั้งโอนอัตโนมัติวันเงินเดือนออก, ทบทวนแผนปีละครั้ง
 - ถ้า `yearsToRetirement < 10` ให้เพิ่มคำเตือนว่าควรลดสัดส่วนหุ้นลงเมื่อใกล้เกษียณ
 
-### 5.8 ⚠️ ข้อความปฏิเสธความรับผิดชอบ (บังคับ)
+### 5.9 ⚠️ ข้อความปฏิเสธความรับผิดชอบ (บังคับ)
 
 ต้องแสดงที่ **ท้ายหน้าผลลัพธ์ทุกครั้ง** ในกล่องที่มองเห็นชัด:
 
@@ -480,9 +520,10 @@ export interface Suggestion {
 
 ### 6.2 เข้าสู่ระบบ / สมัครสมาชิก — `/login`, `/register`
 
-- Supabase Auth ด้วย **อีเมล + รหัสผ่าน** และ **Google OAuth**
-- ยืนยันอีเมลก่อนใช้งาน
-- ลืมรหัสผ่าน → ส่งลิงก์รีเซ็ต
+- Supabase Auth ด้วย **อีเมลจริง + รหัสผ่าน** เท่านั้น ไม่มี Google OAuth
+- ⚠️ **ต้องปิด "Confirm email" ใน Supabase Dashboard** (Authentication → Providers → Email) เพื่อให้สมัครสำเร็จ = ล็อกอินทันที ไม่ต้องกดยืนยันลิงก์ในอีเมลก่อนใช้งาน
+- สมัครสำเร็จ = ล็อกอินทันที ไม่มีขั้นตอนยืนยันอีเมล/OTP คั่นกลาง
+- ยังไม่มีระบบ "ลืมรหัสผ่าน" ในเวอร์ชันนี้ (จะเพิ่มทีหลังโดยใช้อีเมลจริงที่มีอยู่แล้วส่งลิงก์รีเซ็ตได้)
 - ข้อความ error ต้องเป็นภาษาไทยที่คนทั่วไปเข้าใจ ไม่ใช่ error ดิบจาก Supabase
 - หลังล็อกอินสำเร็จ → ไป `/dashboard`
 
@@ -492,14 +533,18 @@ export interface Suggestion {
 
 **การ์ดที่ 1 — ข้อมูลพื้นฐาน**
 
+> ⚠️ **เงินออมกับเงินลงทุนแยกช่องกันเสมอ** ห้ามรวมเป็นช่องเดียว เพราะให้ผลตอบแทนคนละอัตรา (ดูข้อ 5.5–5.6)
+
 | ช่อง | ชนิด | ค่าเริ่มต้น | ตรวจสอบ |
 |---|---|---|---|
-| อายุปัจจุบัน | number | — | 15–80 |
-| อายุที่ต้องการเกษียณ | number | 60 | 40–85, ต้องมากกว่าอายุปัจจุบัน |
-| อายุคาดการณ์ | number | 85 | 60–110, ต้องมากกว่าอายุเกษียณ |
+| อายุปัจจุบัน | number + ปุ่ม ±1 | — | 15–80 |
+| อายุที่ต้องการเกษียณ | number + ปุ่ม ±1 | 60 | 40–85, ต้องมากกว่าอายุปัจจุบัน |
+| อายุคาดการณ์ | number + ปุ่ม ±1 | 85 | 60–110, ต้องมากกว่าอายุเกษียณ |
 | รายจ่ายต่อเดือนที่ต้องการหลังเกษียณ (มูลค่าเงินวันนี้) | currency | — | > 0 |
-| เงินออม/เงินลงทุนที่มีอยู่แล้ว | currency | 0 | ≥ 0 |
-| เงินที่ออมได้จริงต่อเดือน | currency | — | ≥ 0 |
+| เงินฝาก/เงินสดที่มีอยู่แล้ว | currency | 0 | ≥ 0 |
+| เงินลงทุนที่มีอยู่แล้ว | currency | 0 | ≥ 0 |
+| ฝากธนาคารต่อเดือน | currency | 0 | ≥ 0 |
+| ลงทุนต่อเดือน | currency | — | ≥ 0 |
 | ระดับความเสี่ยงที่รับได้ | radio card 3 ใบ | moderate | — |
 
 **การ์ดที่ 2 — เงินบำนาญที่คาดว่าจะได้รับ** (พับเก็บได้)
@@ -517,14 +562,19 @@ export interface Suggestion {
 | ช่อง | ค่าเริ่มต้น |
 |---|---|
 | อัตราเงินเฟ้อ | 3% |
-| อัตราผลตอบแทนคาดหวังต่อปี | ตามระดับความเสี่ยง (3/5/8%) |
+| อัตราผลตอบแทนเงินลงทุนคาดหวังต่อปี | ตามระดับความเสี่ยง (3/5/8%) |
+| อัตราผลตอบแทนเงินฝากต่อปี | 1.5% |
 | เพิ่มเงินออมปีละ (%) | 0% |
 | วิธีคำนวณเงินก้อน | PV of Annuity |
 
 **พฤติกรรมของฟอร์ม**
 
 - แสดงผลลัพธ์คร่าว ๆ (เงินก้อนที่ต้องมี + ต้องออมเดือนละเท่าไหร่) แบบ **real-time ข้างฟอร์ม** ขณะพิมพ์ ไม่ต้องกดปุ่ม
-- ช่องเงินใส่ตัวคั่นหลักพันอัตโนมัติ (`1,234,567`)
+- ช่องเงินใส่ตัวคั่นหลักพันอัตโนมัติขณะพิมพ์ (`1,234,567`) และมีปุ่มลัดเพิ่มทีละ 1,000 / 5,000 / 10,000 อยู่ใต้ช่อง
+- ช่องเปอร์เซ็นต์ (เงินเฟ้อ, ผลตอบแทนเงินลงทุน/เงินฝาก, เพิ่มเงินออมปีละ) มีทั้ง slider ลากได้และช่องพิมพ์ตัวเลขคู่กัน เลื่อนทีละ 0.1% มีปุ่ม +/− ข้างช่อง และปรับด้วยลูกศรขึ้น-ลงบนคีย์บอร์ดได้ (native `<input type="number">`)
+- ช่องอายุมีปุ่ม +/− เลื่อนทีละ 1 ปี
+- ทุกช่องตัวเลขแสดงค่าที่กรอกเป็นข้อความอ่านง่ายใต้ช่อง เช่น "3% ต่อปี" หรือ "20,000 บาทต่อเดือน"
+- บนมือถือ ช่องตัวเลขทุกช่องใช้ `inputMode="decimal"` เพื่อเรียกแป้นตัวเลขขึ้นมาอัตโนมัติ
 - ปุ่ม *ดูผลลัพธ์เต็ม* → บันทึกลง DB แล้วไป `/plan/[id]`
 - ถ้ายังไม่ล็อกอิน: คำนวณดูได้ แต่กดบันทึกจะเด้งไปล็อกอิน แล้ว **กลับมาพร้อมข้อมูลที่กรอกไว้** (เก็บใน sessionStorage ชั่วคราว)
 
@@ -550,24 +600,30 @@ export interface Suggestion {
 
 (ตัวเลขชุดนี้คำนวณจาก TC-01 จริง ใช้เป็นชุดทดสอบของโมดูลคำนวณได้ — ดู TC-07)
 
+**2.5 กล่องเตือนเป้าหมายพิเศษที่ทำให้เงินไม่พอ** (แสดงเหนือกราฟข้อ 3, เฉพาะเมื่อมี — ดูข้อ 5.7)
+
+บอกว่าเป้าหมายไหนทำให้ยอดรวมติดลบ ติดลบตั้งแต่อายุเท่าไหร่ (`negativeFromAge` — ปีแรกที่ยอดรวมติดลบจริงหลังเป้าหมายนั้น อาจมากกว่า `targetAge` ได้ถ้ายังไม่ติดลบทันที) ขาดสูงสุดเท่าไหร่ (มูลค่า ณ ปีที่ขาดหนักที่สุด) และต้องออมเพิ่มเดือนละเท่าไหร่ตั้งแต่วันนี้ถึงอายุเป้าหมายนั้นถึงจะไม่ติดลบ — ตัวเลขทุกตัวคำนวณจริงจาก `findGoalShortfalls`, ห้ามเขียนข้อความลอย ๆ
+
 **3. กราฟเส้นการเติบโตของเงินออม**
 
-- แกน X = อายุ, แกน Y = จำนวนเงิน
-- **3 เส้น:** เงินออมสะสมจริง (รวมผลตอบแทน) / เงินต้นที่ออมไป / เส้นเป้าหมาย (แนวนอน)
-- แรเงาพื้นที่ระหว่างเส้นเงินออมกับเส้นเงินต้น = ผลตอบแทนจากการลงทุน พร้อม label
-- จุดที่มีเป้าหมายพิเศษให้ทำ marker
-- Tooltip แสดงตัวเลขรายปี
+- แกน X = อายุ, แกน Y = จำนวนเงิน — แกน Y ขยายลงไปด้านล่างศูนย์ได้ (ไม่ตรึงขอบล่างที่ 0)
+- **3 เส้น:** ยอดเงินออมสะสมรวม / เงินต้นที่ออมไป (เงินเริ่มต้น + เงินสมทบสะสม) / เส้นเป้าหมาย (แนวนอน = เงินก้อนที่ต้องมี) — ไม่แสดงตัวเลขหรือพื้นที่แรเงาแยกสำหรับผลตอบแทนจากการลงทุน
+- **เส้นศูนย์แนวนอน** ให้เห็นชัด (เส้นทึบ ตัดกับแกน Y ที่ 0)
+- ช่วงที่ยอดรวมติดลบ: เส้น "ยอดเงินออมสะสมรวม" เปลี่ยนเป็นสีแดงและเป็นเส้นประ แยกจากช่วงที่เป็นบวก (สีปกติ เส้นทึบ) พร้อมพื้นที่แรเงาสีแดงจางใต้เส้น
+- จุดที่มีเป้าหมายพิเศษให้ทำ marker (สีแดงถ้าจุดนั้นยอดรวมติดลบ)
+- Tooltip หัวข้อเป็น "อายุ N ปี" แสดงเงินต้นที่ออมไปกับยอดรวมของปีนั้น ตรงกับตารางรายปีแถวเดียวกันเสมอ
 
 **4. กราฟวงกลมสัดส่วนพอร์ต** + รายชื่อสินทรัพย์และช่วงผลตอบแทนคาดหวัง
 
-**5. คำแนะนำการออมและการลงทุน** — จากข้อ 5.7
+**5. คำแนะนำการออมและการลงทุน** — จากข้อ 5.8
 
 **6. ตารางแผนการออมรายปี**
 
-คอลัมน์: ปีที่ / อายุ / ออมเดือนละ / ออมปีนี้รวม / ผลตอบแทนปีนี้ / เป้าหมายพิเศษ / ยอดเงินสะสมปลายปี
+คอลัมน์: ปีที่ / อายุ / ออมเดือนละ / ออมปีนี้รวม / เป้าหมายพิเศษ / ยอดเงินฝากปลายปี / ยอดเงินลงทุนปลายปี / ยอดเงินสะสมปลายปี (รวม) — ไม่แสดงคอลัมน์ผลตอบแทนปีนี้แยกต่างหาก
 
 - ตัวเลขชิดขวา ใช้ฟอนต์ mono
-- แถวที่มีเป้าหมายพิเศษไฮไลต์สีต่าง
+- แถวที่มีเป้าหมายพิเศษไฮไลต์สีเหลือง/ส้มอ่อน
+- **แถวที่ยอดรวมติดลบไฮไลต์สีแดง** (แสดงค่าติดลบตามจริง ไม่ตัดเป็น 0 — ดูข้อ 5.7)
 - ปุ่มพับ/ขยาย (แสดง 10 ปีแรกก่อน)
 
 **7. เปรียบเทียบ 3 วิธีคำนวณ**
@@ -669,10 +725,12 @@ new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-US', {
 
 > ตัวเลขเหล่านี้คำนวณไว้แล้ว **ให้เขียน unit test ให้ผ่านทุกข้อ** (คลาดเคลื่อนได้ไม่เกิน ±1 บาท)
 > และเอกสารโครงงานบทที่ 3 ระบุว่าต้องเทียบผลกับ Microsoft Excel ให้ตรง 100% — ชุดนี้ใช้เทียบได้เลย
+>
+> ตั้งแต่ที่แยกฟิลด์เงินฝาก/เงินลงทุน (ข้อ 5.5) TC-01 ถึง TC-08 ด้านล่างใช้พารามิเตอร์เดิมทุกตัว โดยใส่ "เงินออมเดิม"/"ออมเดือนละ" ทั้งก้อนไว้ที่ **เงินลงทุน** (`currentSavingsInvestment` / `monthlyInvestment`) และตั้ง **เงินฝาก = 0** (`currentSavingsDeposit` = `monthlyDeposit` = 0) ผลลัพธ์ทุกตัวจึงต้องตรงกับตารางเดิมทุกค่า เพราะเมื่อเงินฝาก = 0 การคำนวณสองก้อนแยกกันจะให้ผลเหมือนกับการคำนวณก้อนเดียวแบบเดิมทุกประการ
 
 ### TC-01 — กรณีมาตรฐาน
 
-**Input:** อายุ 25 → เกษียณ 60 → คาดการณ์ 85, รายจ่าย 20,000/เดือน, เงินออมเดิม 100,000, ออมเดือนละ 8,000, ความเสี่ยงปานกลาง (5%), เงินเฟ้อ 3%
+**Input:** อายุ 25 → เกษียณ 60 → คาดการณ์ 85, รายจ่าย 20,000/เดือน, เงินลงทุนเดิม 100,000 (เงินฝากเดิม 0), ลงทุนเดือนละ 8,000 (ฝากเดือนละ 0), ความเสี่ยงปานกลาง (5%), เงินเฟ้อ 3%
 
 | ผลลัพธ์ | ค่าที่ถูกต้อง |
 |---|---|
@@ -772,8 +830,23 @@ new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-US', {
 | อายุคาดการณ์ ≤ อายุเกษียณ | Zod แจ้ง error |
 | เงินออมต่อเดือน = 0 | คำนวณได้ปกติ แสดง gap เต็มจำนวน |
 | เงินบำนาญ > รายจ่าย | `netMonthlyNeed` = 0, เงินก้อนที่ต้องมี = 0, แสดงข้อความว่าเงินบำนาญเพียงพอแล้ว |
-| เป้าหมายพิเศษมากกว่าเงินที่มี | ยอดเงินติดลบไม่ได้ ให้เป็น 0 และเตือนผู้ใช้ |
+| เป้าหมายพิเศษมากกว่าเงินที่มี | **ยอดเงินติดลบได้จริง** (ห้ามตัดเป็น 0 — ดูข้อ 5.7) และ `findGoalShortfalls` ต้องรายงานเป้าหมายนั้นพร้อมจำนวนที่ขาดและเงินที่ต้องออมเพิ่ม |
 | อัตราผลตอบแทน = 0 | ใช้สูตรกรณีพิเศษ ไม่หารศูนย์ |
+
+### TC-09 — แยกเงินฝากกับเงินลงทุนคนละอัตราผลตอบแทน
+
+อายุ 30 → เกษียณ 31, เงินฝากเดิม 100,000 กับเงินลงทุนเดิม 100,000 อย่างละก้อน ไม่มีเงินออมเพิ่มรายเดือน, `depositReturn` 1.5%, `annualReturn` 8%
+
+- ปลายปีที่ 1: `depositBalance` ต้องเท่ากับ `futureValue(100000, 1.5%/12, 12)` และ `investmentBalance` ต้องเท่ากับ `futureValue(100000, 8%/12, 12)` แยกกันคนละยอด (ห้ามใช้อัตราเดียวคำนวณทั้งสองก้อน)
+- `calculateProjectedSavings` ต้องเท่ากับผลรวมของมูลค่าอนาคตของเงินฝากกับเงินลงทุนที่คำนวณแยกกัน
+
+### TC-10 — เป้าหมายพิเศษทำให้เงินไม่พอ (`findGoalShortfalls`)
+
+อายุ 30 → เกษียณ 60, ไม่มีเงินออมเดิม, ลงทุนเดือนละ 1,000, เป้าหมายพิเศษ "ซื้อบ้าน" 2,000,000 บาทตอนอายุ 35
+
+- ยอดรวม ณ อายุ 35 ต้องติดลบจริง (เงินสะสม ~6 หมื่นบาท ไม่พอถอน 2 ล้าน)
+- `findGoalShortfalls` ต้องคืนรายการเดียว ชื่อ "ซื้อบ้าน" อายุเป้าหมาย 35 พร้อม `shortfall` และ `requiredExtraMonthly` ที่มากกว่า 0
+- ถ้าเพิ่ม `monthlyInvestment` ตาม `requiredExtraMonthly` ที่แนะนำ แล้วจำลองใหม่ ยอดรวม ณ อายุ 35 ต้องไม่ติดลบอีก (คลาดเคลื่อนได้ไม่เกิน ±1 บาทจากการปัดเศษ)
 
 ---
 

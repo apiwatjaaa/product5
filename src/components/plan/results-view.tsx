@@ -23,9 +23,16 @@ import { YearlyTable } from "@/components/plan/yearly-table";
 import { MethodComparison } from "@/components/plan/method-comparison";
 import { Disclaimer } from "@/components/plan/disclaimer";
 import { GapAlert, OnTrackNote } from "@/components/plan/gap-alert";
+import { GoalShortfallAlert } from "@/components/plan/goal-shortfall-alert";
 
-import { calculateCorpus, calculateGap, getProjectedSavings, requiredMonthlyContribution } from "@/lib/finance/corpus";
-import { simulateAccumulation } from "@/lib/finance/simulate";
+import {
+  calculateCorpus,
+  calculateGap,
+  calculateProjectedSavingsBreakdown,
+  getProjectedSavings,
+  requiredMonthlyContribution,
+} from "@/lib/finance/corpus";
+import { findGoalShortfalls, simulateAccumulation } from "@/lib/finance/simulate";
 import { generateSuggestions } from "@/lib/finance/recommend";
 import { RISK_PROFILES } from "@/lib/finance/constants";
 import { formatCurrency } from "@/lib/format";
@@ -41,15 +48,20 @@ export function ResultsView({ input }: { input: PlanInput }) {
   const projected = useMemo(() => getProjectedSavings(input), [input]);
   const gap = calculateGap(corpus.selected, projected);
   const suggestions = useMemo(() => generateSuggestions(input), [input]);
+  const goalShortfalls = useMemo(() => findGoalShortfalls(input), [input]);
   const riskProfile = RISK_PROFILES[input.riskLevel];
 
-  const requiredPMT = requiredMonthlyContribution(
+  const months = (input.retirementAge - input.currentAge) * 12;
+  const { deposit: fvDeposit } = calculateProjectedSavingsBreakdown(input);
+  const requiredInvestmentPMT = requiredMonthlyContribution(
     corpus.selected,
-    input.currentSavings,
+    input.currentSavingsInvestment,
     input.annualReturn / 12,
-    (input.retirementAge - input.currentAge) * 12,
+    months,
+    fvDeposit,
   );
-  const savingIsSufficient = input.monthlyContribution >= requiredPMT;
+  const requiredPMT = input.monthlyDeposit + requiredInvestmentPMT;
+  const savingIsSufficient = input.monthlyDeposit + input.monthlyInvestment >= requiredPMT;
 
   const corpusDisplay = useCountUp(corpus.selected);
   const requiredPmtDisplay = useCountUp(requiredPMT);
@@ -92,7 +104,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
               {formatCurrency(requiredPmtDisplay, locale)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {t("results.summary.comparedToActual")}: {formatCurrency(input.monthlyContribution, locale)}
+              {t("results.summary.comparedToActual")}:{" "}
+              {formatCurrency(input.monthlyDeposit + input.monthlyInvestment, locale)}
             </p>
           </CardContent>
         </Card>
@@ -126,7 +139,8 @@ export function ResultsView({ input }: { input: PlanInput }) {
       {gap <= 0 && <OnTrackNote excess={projected - corpus.selected} />}
 
       {/* 3. กราฟเส้นการเติบโตของเงินออม */}
-      <Reveal>
+      <Reveal className="space-y-4">
+        <GoalShortfallAlert shortfalls={goalShortfalls} />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -135,7 +149,12 @@ export function ResultsView({ input }: { input: PlanInput }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <GrowthChart rows={simulation.rows} target={corpus.selected} currentAge={input.currentAge} />
+            <GrowthChart
+              rows={simulation.rows}
+              target={corpus.selected}
+              currentAge={input.currentAge}
+              initialSavings={input.currentSavingsDeposit + input.currentSavingsInvestment}
+            />
           </CardContent>
         </Card>
       </Reveal>

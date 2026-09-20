@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNumberField } from "@/hooks/use-number-field";
+
+const QUICK_ADD_STEPS = [1000, 5000, 10000];
 
 function formatThousands(value: number): string {
   if (Number.isNaN(value)) return "";
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
-}
-
-function parseDigits(raw: string): number {
-  const cleaned = raw.replace(/[^0-9]/g, "");
-  return cleaned === "" ? 0 : Number(cleaned);
 }
 
 export function CurrencyField({
@@ -19,32 +17,53 @@ export function CurrencyField({
   id,
   ariaLabel,
   ariaDescribedBy,
+  helperText,
+  quickAddSteps = QUICK_ADD_STEPS,
 }: {
   value: number;
   onChange: (value: number) => void;
   id?: string;
   ariaLabel?: string;
   ariaDescribedBy?: string;
+  helperText?: string;
+  quickAddSteps?: number[];
 }) {
-  const [text, setText] = useState(formatThousands(value));
-
-  useEffect(() => {
-    setText(formatThousands(value));
-  }, [value]);
+  const { inputProps } = useNumberField({
+    value,
+    onChange,
+    format: formatThousands,
+    round: Math.round,
+    min: 0,
+    step: quickAddSteps[0] ?? 1000,
+    allowDecimal: false,
+  });
 
   return (
-    <Input
-      id={id}
-      inputMode="numeric"
-      aria-label={ariaLabel}
-      aria-describedby={ariaDescribedBy}
-      value={text}
-      onChange={(e) => {
-        const parsed = parseDigits(e.target.value);
-        setText(parsed === 0 ? e.target.value.replace(/[^0-9]/g, "") : formatThousands(parsed));
-        onChange(parsed);
-      }}
-      className="text-right font-mono"
-    />
+    <div className="space-y-1.5">
+      <Input
+        id={id}
+        type="text"
+        aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
+        className="text-right font-mono"
+        {...inputProps}
+      />
+      {quickAddSteps.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {quickAddSteps.map((step) => (
+            <Button
+              key={step}
+              type="button"
+              variant="outline"
+              size="xs"
+              onClick={() => onChange(value + step)}
+            >
+              +{formatThousands(step)}
+            </Button>
+          ))}
+        </div>
+      )}
+      {helperText && <p className="text-xs text-muted-foreground">{helperText}</p>}
+    </div>
   );
 }

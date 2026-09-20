@@ -3,27 +3,28 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import { authErrorKey } from "@/lib/supabase/auth-errors";
-import { getCallbackUrl } from "@/lib/supabase/redirect-url";
 import { registerSchema, type RegisterValues } from "@/lib/validation/authSchema";
 
 export default function RegisterPage() {
   const t = useTranslations("auth.register");
   const tErrors = useTranslations("auth.errors");
-  const locale = useLocale();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/dashboard";
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
 
   const {
     register,
@@ -35,10 +36,9 @@ export default function RegisterPage() {
     setServerError(null);
     setIsSubmitting(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
-      options: { emailRedirectTo: getCallbackUrl(locale, "/dashboard") },
     });
     setIsSubmitting(false);
 
@@ -46,19 +46,17 @@ export default function RegisterPage() {
       setServerError(tErrors(authErrorKey(error.message) as "generic"));
       return;
     }
-    setEmailSent(true);
-  };
 
-  if (emailSent) {
-    return (
-      <AuthCard title={t("checkEmailTitle")}>
-        <p className="text-sm text-muted-foreground">{t("checkEmailBody")}</p>
-        <Link href="/login" className="mt-4 inline-block text-sm font-medium hover:underline">
-          {t("loginLink")}
-        </Link>
-      </AuthCard>
-    );
-  }
+    // Supabase ไม่คืน error เมื่ออีเมลนี้ถูกใช้ไปแล้ว แต่จะคืนผู้ใช้ที่มี identities ว่างเปล่าแทน
+    // (กันการสแกนหาอีเมลที่มีอยู่จริง) จึงต้องเช็คตรงนี้เพื่อบอกว่าอีเมลถูกใช้แล้ว
+    if (signUpData.user && signUpData.user.identities?.length === 0) {
+      setServerError(tErrors("emailTaken"));
+      return;
+    }
+
+    router.push(next);
+    router.refresh();
+  };
 
   return (
     <AuthCard title={t("title")}>

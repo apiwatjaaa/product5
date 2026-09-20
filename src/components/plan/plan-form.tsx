@@ -35,9 +35,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CurrencyField } from "@/components/plan/currency-field";
+import { PercentField } from "@/components/plan/percent-field";
+import { StepperField } from "@/components/plan/stepper-field";
 import { RISK_LEVEL_ORDER, RISK_PROFILES } from "@/lib/finance/constants";
 import { calculateCorpus, calculateGap, calculateProjectedSavings } from "@/lib/finance/corpus";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import {
   planFormDefaults,
   planFormSchema,
@@ -152,6 +154,23 @@ export function PlanForm({
     router.refresh();
   };
 
+  const formatPercentValue = (value: number | undefined) => String(Math.round(((value ?? 0) * 100) * 10) / 10);
+
+  const ageHelper = (value: number | undefined) =>
+    t("planForm.helper.ageYears", { value: value ?? 0 });
+  const currencyPerMonthHelper = (value: number | undefined) =>
+    t("planForm.helper.currencyPerMonth", { value: formatNumber(value ?? 0, locale) });
+  const currencyTotalHelper = (value: number | undefined) =>
+    t("planForm.helper.currencyTotal", { value: formatNumber(value ?? 0, locale) });
+  const inflationHelper = (value: number | undefined) =>
+    t("planForm.helper.inflationHelper", { value: formatPercentValue(value) });
+  const annualReturnHelper = (value: number | undefined) =>
+    t("planForm.helper.annualReturnHelper", { value: formatPercentValue(value) });
+  const depositReturnHelper = (value: number | undefined) =>
+    t("planForm.helper.depositReturnHelper", { value: formatPercentValue(value) });
+  const contributionGrowthHelper = (value: number | undefined) =>
+    t("planForm.helper.contributionGrowthPerYear", { value: formatPercentValue(value) });
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -168,11 +187,16 @@ export function PlanForm({
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="currentAge">{t("planForm.basicCard.currentAge")}</Label>
-              <Input
+              <StepperField
                 id="currentAge"
-                type="number"
-                aria-describedby={errors.currentAge ? "currentAge-error" : undefined}
-                {...register("currentAge", { valueAsNumber: true })}
+                value={values.currentAge ?? 0}
+                onChange={(v) => setValue("currentAge", v, { shouldValidate: true })}
+                min={15}
+                max={80}
+                helperText={ageHelper(values.currentAge)}
+                ariaDescribedBy={errors.currentAge ? "currentAge-error" : undefined}
+                decreaseAriaLabel={t("common.decrease")}
+                increaseAriaLabel={t("common.increase")}
               />
               {errors.currentAge && (
                 <p id="currentAge-error" className="text-xs text-destructive">
@@ -183,11 +207,16 @@ export function PlanForm({
 
             <div className="space-y-1.5">
               <Label htmlFor="retirementAge">{t("planForm.basicCard.retirementAge")}</Label>
-              <Input
+              <StepperField
                 id="retirementAge"
-                type="number"
-                aria-describedby={errors.retirementAge ? "retirementAge-error" : undefined}
-                {...register("retirementAge", { valueAsNumber: true })}
+                value={values.retirementAge ?? 0}
+                onChange={(v) => setValue("retirementAge", v, { shouldValidate: true })}
+                min={40}
+                max={85}
+                helperText={ageHelper(values.retirementAge)}
+                ariaDescribedBy={errors.retirementAge ? "retirementAge-error" : undefined}
+                decreaseAriaLabel={t("common.decrease")}
+                increaseAriaLabel={t("common.increase")}
               />
               {errors.retirementAge && (
                 <p id="retirementAge-error" className="text-xs text-destructive">
@@ -198,11 +227,16 @@ export function PlanForm({
 
             <div className="space-y-1.5">
               <Label htmlFor="lifeExpectancy">{t("planForm.basicCard.lifeExpectancy")}</Label>
-              <Input
+              <StepperField
                 id="lifeExpectancy"
-                type="number"
-                aria-describedby={errors.lifeExpectancy ? "lifeExpectancy-error" : undefined}
-                {...register("lifeExpectancy", { valueAsNumber: true })}
+                value={values.lifeExpectancy ?? 0}
+                onChange={(v) => setValue("lifeExpectancy", v, { shouldValidate: true })}
+                min={60}
+                max={110}
+                helperText={ageHelper(values.lifeExpectancy)}
+                ariaDescribedBy={errors.lifeExpectancy ? "lifeExpectancy-error" : undefined}
+                decreaseAriaLabel={t("common.decrease")}
+                increaseAriaLabel={t("common.increase")}
               />
               {errors.lifeExpectancy && (
                 <p id="lifeExpectancy-error" className="text-xs text-destructive">
@@ -220,6 +254,7 @@ export function PlanForm({
                 value={values.monthlyExpenseToday ?? 0}
                 onChange={(v) => setValue("monthlyExpenseToday", v, { shouldValidate: true })}
                 ariaDescribedBy={errors.monthlyExpenseToday ? "monthlyExpenseToday-error" : undefined}
+                helperText={currencyPerMonthHelper(values.monthlyExpenseToday)}
               />
               {errors.monthlyExpenseToday && (
                 <p id="monthlyExpenseToday-error" className="text-xs text-destructive">
@@ -229,22 +264,46 @@ export function PlanForm({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="currentSavings">{t("planForm.basicCard.currentSavings")}</Label>
+              <Label htmlFor="currentSavingsDeposit">
+                {t("planForm.basicCard.currentSavingsDeposit")}
+              </Label>
               <CurrencyField
-                id="currentSavings"
-                value={values.currentSavings ?? 0}
-                onChange={(v) => setValue("currentSavings", v, { shouldValidate: true })}
+                id="currentSavingsDeposit"
+                value={values.currentSavingsDeposit ?? 0}
+                onChange={(v) => setValue("currentSavingsDeposit", v, { shouldValidate: true })}
+                helperText={currencyTotalHelper(values.currentSavingsDeposit)}
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="monthlyContribution">
-                {t("planForm.basicCard.monthlyContribution")}
+              <Label htmlFor="currentSavingsInvestment">
+                {t("planForm.basicCard.currentSavingsInvestment")}
               </Label>
               <CurrencyField
-                id="monthlyContribution"
-                value={values.monthlyContribution ?? 0}
-                onChange={(v) => setValue("monthlyContribution", v, { shouldValidate: true })}
+                id="currentSavingsInvestment"
+                value={values.currentSavingsInvestment ?? 0}
+                onChange={(v) => setValue("currentSavingsInvestment", v, { shouldValidate: true })}
+                helperText={currencyTotalHelper(values.currentSavingsInvestment)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="monthlyDeposit">{t("planForm.basicCard.monthlyDeposit")}</Label>
+              <CurrencyField
+                id="monthlyDeposit"
+                value={values.monthlyDeposit ?? 0}
+                onChange={(v) => setValue("monthlyDeposit", v, { shouldValidate: true })}
+                helperText={currencyPerMonthHelper(values.monthlyDeposit)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="monthlyInvestment">{t("planForm.basicCard.monthlyInvestment")}</Label>
+              <CurrencyField
+                id="monthlyInvestment"
+                value={values.monthlyInvestment ?? 0}
+                onChange={(v) => setValue("monthlyInvestment", v, { shouldValidate: true })}
+                helperText={currencyPerMonthHelper(values.monthlyInvestment)}
               />
             </div>
 
@@ -293,6 +352,7 @@ export function PlanForm({
                   id="pensionMonthlyToday"
                   value={values.pensionMonthlyToday ?? 0}
                   onChange={(v) => setValue("pensionMonthlyToday", v, { shouldValidate: true })}
+                  helperText={currencyPerMonthHelper(values.pensionMonthlyToday)}
                 />
                 <p className="text-xs text-muted-foreground">{t("planForm.pensionCard.note")}</p>
               </div>
@@ -319,12 +379,15 @@ export function PlanForm({
                     ariaLabel={t("planForm.goalsCard.amountPlaceholder")}
                     value={values.goals?.[index]?.amountToday ?? 0}
                     onChange={(v) => setValue(`goals.${index}.amountToday`, v, { shouldValidate: true })}
+                    quickAddSteps={[]}
                   />
-                  <Input
-                    type="number"
-                    aria-label={t("planForm.goalsCard.targetAgePlaceholder")}
-                    placeholder={t("planForm.goalsCard.targetAgePlaceholder")}
-                    {...register(`goals.${index}.targetAge` as const, { valueAsNumber: true })}
+                  <StepperField
+                    value={values.goals?.[index]?.targetAge ?? 0}
+                    onChange={(v) => setValue(`goals.${index}.targetAge`, v, { shouldValidate: true })}
+                    min={1}
+                    max={120}
+                    decreaseAriaLabel={t("common.decrease")}
+                    increaseAriaLabel={t("common.increase")}
                   />
                   <Button
                     type="button"
@@ -358,37 +421,53 @@ export function PlanForm({
             <AccordionContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="inflationRate">{t("planForm.advancedCard.inflationRate")}</Label>
-                <Input
+                <PercentField
                   id="inflationRate"
-                  type="number"
-                  step="0.1"
-                  value={((values.inflationRate ?? 0) * 100).toFixed(1)}
-                  onChange={(e) => setValue("inflationRate", Number(e.target.value) / 100)}
+                  value={values.inflationRate ?? 0}
+                  onChange={(v) => setValue("inflationRate", v)}
+                  helperText={inflationHelper(values.inflationRate)}
+                  decreaseAriaLabel={t("common.decrease")}
+                  increaseAriaLabel={t("common.increase")}
+                  presets={[2, 3, 5]}
                 />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="annualReturn">{t("planForm.advancedCard.annualReturn")}</Label>
-                <Input
+                <PercentField
                   id="annualReturn"
-                  type="number"
-                  step="0.1"
-                  value={((values.annualReturn ?? 0) * 100).toFixed(1)}
-                  onChange={(e) => setValue("annualReturn", Number(e.target.value) / 100)}
+                  value={values.annualReturn ?? 0}
+                  onChange={(v) => setValue("annualReturn", v)}
+                  helperText={annualReturnHelper(values.annualReturn)}
+                  decreaseAriaLabel={t("common.decrease")}
+                  increaseAriaLabel={t("common.increase")}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="depositReturn">{t("planForm.advancedCard.depositReturn")}</Label>
+                <PercentField
+                  id="depositReturn"
+                  value={values.depositReturn ?? 0}
+                  onChange={(v) => setValue("depositReturn", v)}
+                  max={10}
+                  helperText={depositReturnHelper(values.depositReturn)}
+                  decreaseAriaLabel={t("common.decrease")}
+                  increaseAriaLabel={t("common.increase")}
                 />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="contributionGrowth">
                   {t("planForm.advancedCard.contributionGrowth")}
                 </Label>
-                <Input
+                <PercentField
                   id="contributionGrowth"
-                  type="number"
-                  step="0.1"
-                  value={((values.contributionGrowth ?? 0) * 100).toFixed(1)}
-                  onChange={(e) => setValue("contributionGrowth", Number(e.target.value) / 100)}
+                  value={values.contributionGrowth ?? 0}
+                  onChange={(v) => setValue("contributionGrowth", v)}
+                  helperText={contributionGrowthHelper(values.contributionGrowth)}
+                  decreaseAriaLabel={t("common.decrease")}
+                  increaseAriaLabel={t("common.increase")}
                 />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="corpusMethod">{t("planForm.advancedCard.corpusMethod")}</Label>
                 <Select
                   value={values.corpusMethod ?? "annuity"}
@@ -398,11 +477,21 @@ export function PlanForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="annuity">{t("corpusMethod.annuity")}</SelectItem>
-                    <SelectItem value="simple">{t("corpusMethod.simple")}</SelectItem>
-                    <SelectItem value="rule4">{t("corpusMethod.rule4")}</SelectItem>
+                    {(["annuity", "simple", "rule4"] as const).map((method) => (
+                      <SelectItem key={method} value={method} label={t(`corpusMethod.${method}`)}>
+                        <span className="flex flex-col gap-0.5 py-0.5 whitespace-normal">
+                          <span>{t(`corpusMethod.${method}`)}</span>
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {t(`corpusMethodDescription.${method}`)}
+                          </span>
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  {t(`corpusMethodDescription.${values.corpusMethod ?? "annuity"}`)}
+                </p>
               </div>
             </AccordionContent>
           </AccordionItem>

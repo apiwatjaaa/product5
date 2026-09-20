@@ -7,6 +7,11 @@ export function futureValue(pv: number, rate: number, periods: number): number {
   return pv * Math.pow(1 + rate, periods);
 }
 
+/** มูลค่าอนาคตของเงินก้อนเดียวแบบดอกเบี้ยธรรมดา (ไม่ทบต้น): FV = PV × (1 + r×n) — ใช้เทียบกับ futureValue เพื่อสอนความต่างของดอกเบี้ยทบต้น */
+export function futureValueSimple(pv: number, rate: number, periods: number): number {
+  return pv * (1 + rate * periods);
+}
+
 /** มูลค่าอนาคตของเงินออมสม่ำเสมอ (Ordinary Annuity — ออมปลายงวด) */
 export function futureValueAnnuity(pmt: number, rate: number, periods: number): number {
   if (Math.abs(rate) < 1e-9) return pmt * periods; // กันหารศูนย์
