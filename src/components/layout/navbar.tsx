@@ -21,21 +21,21 @@ export async function Navbar() {
           {t("brand.name")}
         </Link>
         <nav className="flex flex-wrap items-center gap-1">
-          <Button variant="ghost" size="sm" render={<Link href="/learn" />}>
+          <Button variant="ghost" size="sm" render={<Link href="/learn" />} nativeButton={false}>
             {t("nav.learn")}
           </Button>
-          <Button variant="ghost" size="sm" render={<Link href="/plan/new" />}>
+          <Button variant="ghost" size="sm" render={<Link href="/plan/new" />} nativeButton={false}>
             {t("nav.planNew")}
           </Button>
           {user ? (
             <>
-              <Button variant="ghost" size="sm" render={<Link href="/dashboard" />}>
+              <Button variant="ghost" size="sm" render={<Link href="/dashboard" />} nativeButton={false}>
                 {t("nav.dashboard")}
               </Button>
               <SignOutButton />
             </>
           ) : (
-            <Button variant="ghost" size="sm" render={<Link href="/login" />}>
+            <Button variant="ghost" size="sm" render={<Link href="/login" />} nativeButton={false}>
               {t("nav.login")}
             </Button>
           )}
