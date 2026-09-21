@@ -41,11 +41,13 @@ export default async function HomePage() {
       icon: PiggyBank,
       title: t("landing.features.calculate.title"),
       description: t("landing.features.calculate.description"),
+      href: "/plan/new",
     },
     {
       icon: LineChart,
       title: t("landing.features.track.title"),
       description: t("landing.features.track.description"),
+      href: "/plan/new",
     },
     {
       icon: GraduationCap,
@@ -147,27 +149,20 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            const card = (
-              <Card className="h-full transition-shadow group-hover:shadow-md">
-                <CardContent className="flex h-full flex-col gap-3">
-                  <Icon
-                    className="size-6 shrink-0 text-primary drop-shadow-[0_0_6px_var(--glow)]"
-                    aria-hidden="true"
-                  />
-                  <h2 className="font-semibold">{feature.title}</h2>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            );
             return (
               <Reveal key={feature.title} delayMs={index * 80}>
-                {"href" in feature ? (
-                  <Link href={feature.href} className="group block h-full">
-                    {card}
-                  </Link>
-                ) : (
-                  card
-                )}
+                <Link href={feature.href} className="group block h-full">
+                  <Card className="h-full transition-[box-shadow,border-color] group-hover:border-primary/50 group-hover:shadow-md">
+                    <CardContent className="flex h-full flex-col gap-3">
+                      <Icon
+                        className="size-6 shrink-0 text-primary drop-shadow-[0_0_6px_var(--glow)]"
+                        aria-hidden="true"
+                      />
+                      <h2 className="font-semibold">{feature.title}</h2>
+                      <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
               </Reveal>
             );
           })}
