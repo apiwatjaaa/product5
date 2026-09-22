@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -42,15 +41,13 @@ export function InstallAppButton() {
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <Button variant="ghost" size="icon" aria-label={t("install")} onClick={handleInstall} />
-        }
-      >
-        <Download />
-      </TooltipTrigger>
-      <TooltipContent>{t("install")}</TooltipContent>
-    </Tooltip>
+    <Button
+      size="sm"
+      onClick={handleInstall}
+      className="animate-in fade-in zoom-in-95 gap-1.5 rounded-full duration-300"
+    >
+      <Download className="size-3.5" />
+      {t("install")}
+    </Button>
   );
 }
