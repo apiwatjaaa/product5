@@ -9,6 +9,9 @@
     "learn": "Financial knowledge",
     "login": "Log in"
   },
+  "pwa": {
+    "install": "Install app"
+  },
   "theme": {
     "toggle": "Toggle theme",
     "switchToLight": "Switch to light theme",

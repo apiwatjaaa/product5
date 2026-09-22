@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
+import { InstallAppButton } from "@/components/layout/install-app-button";
 
 export async function Navbar() {
   const t = await getTranslations();
@@ -40,6 +41,7 @@ export async function Navbar() {
               {t("nav.login")}
             </Button>
           )}
+          <InstallAppButton />
           <LocaleToggle />
           <ModeToggle />
         </nav>
