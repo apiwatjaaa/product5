@@ -390,6 +390,26 @@
     "assetAllocationCalculator": {
       "title": "Try adjusting the portfolio by risk level",
       "chooseRisk": "Choose a risk level"
+    },
+    "personalIncomeTaxCalculator": {
+      "title": "Try calculating personal income tax yourself",
+      "monthlyIncome": "Monthly income (baht)",
+      "monthlyIncomeHelper": "Assumes a regular salaried job, excluding bonuses or other income",
+      "expenseDeduction": "Expense deduction (50%, capped at {cap} baht)",
+      "personalAllowance": "Personal allowance",
+      "netTaxableIncome": "Net taxable income",
+      "totalTax": "Tax owed for the year",
+      "monthlyTax": "About {amount} per month",
+      "netMonthlyIncome": "Net income after tax (per month)",
+      "effectiveRate": "Effective tax rate (vs. annual income)",
+      "marginalRate": "Marginal tax rate: {rate}",
+      "bracketTitle": "Progressive personal income tax brackets",
+      "bracketHeaderRange": "Net income range",
+      "bracketHeaderRate": "Tax rate",
+      "bracketHeaderTax": "Tax in this bracket",
+      "bracketRangeTo": "{from} – {to} baht",
+      "bracketRangeOpen": "Over {from} baht",
+      "scopeNote": "Covers salaried income only, using the standard expense deduction and personal allowance. It excludes other deductions such as social security, SSF/RMF funds, a spouse, or children, so your actual tax may be lower."
     }
   }
 }

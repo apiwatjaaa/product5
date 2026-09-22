@@ -7,6 +7,7 @@ import { InflationCalculator } from "@/components/learn/inflation-calculator";
 import { RealReturnCalculator } from "@/components/learn/real-return-calculator";
 import { RiskReturnCalculator } from "@/components/learn/risk-return-calculator";
 import { AssetAllocationCalculator } from "@/components/learn/asset-allocation-calculator";
+import { PersonalIncomeTaxCalculator } from "@/components/learn/personal-income-tax-calculator";
 
 export const LEARN_CALCULATORS: Record<LearnSlug, ComponentType> = {
   "time-value-of-money": TvmCalculator,
@@ -15,4 +16,5 @@ export const LEARN_CALCULATORS: Record<LearnSlug, ComponentType> = {
   "real-return": RealReturnCalculator,
   "risk-and-return": RiskReturnCalculator,
   "asset-allocation": AssetAllocationCalculator,
+  "personal-income-tax": PersonalIncomeTaxCalculator,
 };

@@ -7,7 +7,8 @@ export type LearnSlug =
   | "inflation"
   | "real-return"
   | "risk-and-return"
-  | "asset-allocation";
+  | "asset-allocation"
+  | "personal-income-tax";
 
 export interface LearnSection {
   headingTh: string;
@@ -216,6 +217,39 @@ export const LEARN_ARTICLES: LearnArticle[] = [
         ],
         bodyEn: [
           "This site offers 3 default portfolio mixes based on the risk level you select on the form, shown in the table below. As a general rule, the closer you get to retirement, the more you should gradually reduce your stock allocation to lower the risk of a heavy loss right before you need the money.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "personal-income-tax",
+    titleTh: "ภาษีเงินได้บุคคลธรรมดา",
+    titleEn: "Personal Income Tax",
+    summaryTh: "ทำไม \"เงินเดือน\" กับ \"เงินที่ออมได้จริง\" ไม่ใช่ตัวเลขเดียวกัน และภาษีแบบขั้นบันไดทำงานอย่างไร",
+    summaryEn: "Why your salary and the money you can actually save aren't the same number, and how progressive tax brackets work.",
+    sections: [
+      {
+        headingTh: "ภาษีแบบขั้นบันได (Progressive Tax) คืออะไร",
+        headingEn: "What is progressive tax",
+        bodyTh: [
+          "หลายคนเข้าใจผิดว่าถ้าเงินได้สุทธิของตัวเองตกอยู่ในขั้นภาษี 15% แปลว่าต้องเสียภาษี 15% ของเงินได้ทั้งก้อน แต่ความจริงแล้วระบบภาษีของไทยเป็นแบบขั้นบันได (Progressive) คือเงินได้แต่ละส่วนที่ตกอยู่ในแต่ละขั้นจะถูกเก็บภาษีตามอัตราของขั้นนั้นเท่านั้น ไม่ใช่ทั้งก้อน",
+          "ตัวอย่างเช่น เงินได้สุทธิ 400,000 บาท จะเสียภาษี 0% สำหรับ 150,000 บาทแรก, 5% สำหรับช่วง 150,001–300,000 บาท และ 10% เฉพาะส่วนที่เกิน 300,000 บาทขึ้นไปเท่านั้น ไม่ใช่ 10% ของทั้งก้อน — อัตรา 10% นี้เรียกว่า \"อัตราภาษีขั้นสูงสุด\" (Marginal Rate) ส่วน \"อัตราภาษีเฉลี่ย\" (Effective Rate) คือภาษีรวมทั้งหมดหารด้วยเงินได้ ซึ่งจะต่ำกว่าอัตราขั้นสูงสุดเสมอ",
+        ],
+        bodyEn: [
+          "A common misconception is that landing in the 15% tax bracket means your entire income is taxed at 15%. Thailand's tax system is actually progressive: each portion of income that falls within a bracket is taxed only at that bracket's rate, not the whole amount.",
+          "For example, a net taxable income of 400,000 baht pays 0% on the first 150,000 baht, 5% on the 150,001–300,000 baht portion, and 10% only on the amount above 300,000 baht — not 10% of the whole sum. That 10% is called the \"marginal rate.\" The \"effective rate\" is the total tax divided by total income, which is always lower than the marginal rate.",
+        ],
+      },
+      {
+        headingTh: "ทำไมภาษีถึงเกี่ยวกับแผนเกษียณ",
+        headingEn: "Why tax matters for retirement planning",
+        bodyTh: [
+          "เงินที่นำมาออมหรือลงทุนเพื่อเกษียณแต่ละเดือน มาจาก \"รายได้หลังหักภาษี\" ไม่ใช่เงินเดือนเต็มจำนวน ถ้าประเมินกำลังออมจากเงินเดือนก่อนหักภาษี ตัวเลขที่วางแผนไว้อาจสูงเกินความเป็นจริง โดยเฉพาะเมื่อรายได้เพิ่มขึ้นจนขยับไปอยู่ในขั้นภาษีที่สูงขึ้น",
+          "เครื่องมือด้านล่างช่วยประมาณภาษีเงินได้บุคคลธรรมดาแบบง่าย จากเงินเดือนอย่างเดียว หักค่าใช้จ่ายและค่าลดหย่อนส่วนตัวตามมาตรฐานเท่านั้น เพื่อให้เห็นภาพว่าเงินที่เหลือจริงต่อเดือนมีเท่าไหร่",
+        ],
+        bodyEn: [
+          "The money you set aside for retirement each month comes from income after tax, not your full salary. Estimating your savings capacity from pre-tax salary can overstate what you can actually contribute, especially once your income grows into a higher bracket.",
+          "The calculator below gives a simplified personal income tax estimate based on salary alone, using only the standard expense deduction and personal allowance, to show roughly how much you actually have left each month.",
         ],
       },
     ],

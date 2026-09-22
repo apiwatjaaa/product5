@@ -1,6 +1,7 @@
 import {
   Clock3,
   PieChart,
+  Receipt,
   Scale,
   ShieldQuestion,
   TrendingDown,
@@ -17,4 +18,5 @@ export const ARTICLE_ICONS: Record<LearnSlug, LucideIcon> = {
   "real-return": Scale,
   "risk-and-return": ShieldQuestion,
   "asset-allocation": PieChart,
+  "personal-income-tax": Receipt,
 };

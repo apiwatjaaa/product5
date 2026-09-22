@@ -14,6 +14,7 @@ import {
 } from '../corpus';
 import { findGoalShortfalls, simulateAccumulation } from '../simulate';
 import { generateSuggestions } from '../recommend';
+import { calculateEmploymentTaxableIncome, calculateProgressiveTax } from '../tax';
 import type { PlanInput } from '../types';
 
 const TOLERANCE = 1;
@@ -463,5 +464,39 @@ describe('TC-11 ยอดติดลบต้องเป็นจริง ห
     const result = simulateAccumulation(input);
     const rowsAfterGoal = result.rows.filter((r) => r.age >= 32 && r.age <= 40);
     expect(rowsAfterGoal.every((r) => r.endingBalance < 0)).toBe(true);
+  });
+});
+
+describe('tax.ts', () => {
+  it('เงินได้สุทธิ 0 บาท ไม่เสียภาษี', () => {
+    const result = calculateProgressiveTax(0);
+    expect(result.totalTax).toBe(0);
+    expect(result.marginalRate).toBe(0);
+  });
+
+  it('เงินได้สุทธิ 150,000 บาทแรก ได้รับยกเว้นภาษีทั้งหมด', () => {
+    const result = calculateProgressiveTax(150_000);
+    expect(result.totalTax).toBe(0);
+  });
+
+  it('เงินได้สุทธิ 400,000 บาท เสียภาษีแบบขั้นบันไดถูกต้อง', () => {
+    // 150,000 แรก 0% + 150,000 ถัดไป 5% (7,500) + 100,000 ที่เหลือ 10% (10,000)
+    const result = calculateProgressiveTax(400_000);
+    expectClose(result.totalTax, 17_500, 0.01);
+    expect(result.marginalRate).toBe(0.1);
+  });
+
+  it('เงินได้สุทธิเกิน 5,000,000 บาท ใช้อัตราขั้นสูงสุด 35% กับส่วนเกิน', () => {
+    const result = calculateProgressiveTax(5_100_000);
+    expect(result.marginalRate).toBe(0.35);
+    const lastBracket = result.brackets.at(-1)!;
+    expectClose(lastBracket.taxForBracket, 35_000, 0.01);
+  });
+
+  it('calculateEmploymentTaxableIncome หักค่าใช้จ่าย 50% สูงสุด 100,000 และค่าลดหย่อนส่วนตัว 60,000', () => {
+    // รายได้ 600,000: หักค่าใช้จ่าย min(300,000, 100,000) = 100,000, หักส่วนตัว 60,000
+    expectClose(calculateEmploymentTaxableIncome(600_000), 440_000, 0.01);
+    // รายได้ 100,000: หักค่าใช้จ่าย min(50,000, 100,000) = 50,000, หักส่วนตัว 60,000 → ไม่ติดลบ
+    expectClose(calculateEmploymentTaxableIncome(100_000), 0, 0.01);
   });
 });
