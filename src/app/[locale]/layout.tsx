@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SITE_URL } from "@/lib/site";
 import "../globals.css";
 
 const fontSans = IBM_Plex_Sans_Thai({
@@ -38,8 +39,20 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale });
   return {
+    metadataBase: new URL(SITE_URL),
     title: t("brand.name"),
     description: t("landing.heroSubtitle"),
+    alternates: {
+      canonical: `/${locale}`,
+      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+    },
+    openGraph: {
+      title: t("brand.name"),
+      description: t("landing.heroSubtitle"),
+      url: `/${locale}`,
+      locale,
+      type: "website",
+    },
   };
 }
 
