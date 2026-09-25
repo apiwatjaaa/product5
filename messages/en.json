@@ -393,8 +393,12 @@
     },
     "personalIncomeTaxCalculator": {
       "title": "Try calculating personal income tax yourself",
+      "modeAverage": "Same income every month",
+      "modeMonthly": "Income varies by month",
       "monthlyIncome": "Monthly income (baht)",
       "monthlyIncomeHelper": "Assumes a regular salaried job, excluding bonuses or other income",
+      "totalAnnualIncome": "Total annual income",
+      "monthlyModeHelper": "Enter each month's actual income, such as months with higher commission or bonuses. Tax is calculated on total annual income, so the result is accurate whether or not each month is equal.",
       "expenseDeduction": "Expense deduction (50%, capped at {cap} baht)",
       "personalAllowance": "Personal allowance",
       "netTaxableIncome": "Net taxable income",
