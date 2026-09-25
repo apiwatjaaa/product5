@@ -40,15 +40,15 @@ export async function generateMetadata({
   const t = await getTranslations({ locale });
   return {
     metadataBase: new URL(SITE_URL),
-    title: t("brand.name"),
-    description: t("landing.heroSubtitle"),
+    title: t("seo.title"),
+    description: t("seo.description"),
     alternates: {
       canonical: `/${locale}`,
       languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
     },
     openGraph: {
-      title: t("brand.name"),
-      description: t("landing.heroSubtitle"),
+      title: t("seo.title"),
+      description: t("seo.description"),
       url: `/${locale}`,
       locale,
       type: "website",

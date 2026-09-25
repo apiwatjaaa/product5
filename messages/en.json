@@ -3,6 +3,10 @@
     "name": "My Retirement Plan",
     "school": "Sukhondheerawidh School"
   },
+  "seo": {
+    "title": "My Retirement Plan — Plan Your Retirement & Calculate for Free",
+    "description": "Plan your retirement and calculate the lump sum you'll need at retirement, with an annual savings plan that fully accounts for inflation."
+  },
   "nav": {
     "planNew": "Start calculating",
     "dashboard": "My plans",
