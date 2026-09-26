@@ -256,7 +256,9 @@
       "submitting": "Signing up...",
       "haveAccount": "Already have an account?",
       "loginLink": "Log in",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "checkEmailTitle": "Check your email to confirm your account",
+      "checkEmailDescription": "We've sent a confirmation link to {email}. Click the link in the email to activate your account before logging in."
     },
     "signOut": "Log out",
     "errors": {

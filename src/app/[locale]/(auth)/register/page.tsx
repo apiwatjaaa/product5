@@ -25,6 +25,7 @@ export default function RegisterPage() {
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -54,9 +55,33 @@ export default function RegisterPage() {
       return;
     }
 
+    // เมื่อ Supabase project เปิด "Confirm email" ไว้ signUp จะไม่คืน session จนกว่า
+    // ผู้ใช้จะกดลิงก์ยืนยันในอีเมลก่อน ถ้า push ไป dashboard ตอนนี้จะโดนเด้งกลับมา login
+    // เพราะยังไม่มี session จริง จึงต้องโชว์ข้อความให้ไปเช็คอีเมลแทน
+    if (!signUpData.session) {
+      setPendingConfirmationEmail(data.email);
+      return;
+    }
+
     router.push(next);
     router.refresh();
   };
+
+  if (pendingConfirmationEmail) {
+    return (
+      <AuthCard title={t("title")}>
+        <p className="text-sm font-medium">{t("checkEmailTitle")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("checkEmailDescription", { email: pendingConfirmationEmail })}
+        </p>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          <Link href="/login" className="font-medium text-foreground hover:underline">
+            {t("loginLink")}
+          </Link>
+        </p>
+      </AuthCard>
+    );
+  }
 
   return (
     <AuthCard title={t("title")}>
