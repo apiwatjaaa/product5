@@ -129,7 +129,9 @@ export function PlanForm({
     const corpus = calculateCorpus(input);
     const projected = calculateProjectedSavings(input);
     const gap = calculateGap(corpus.selected, projected);
-    return { corpus, gap };
+    const progress =
+      corpus.selected > 0 && Number.isFinite(projected) ? Math.min(1, Math.max(0, projected / corpus.selected)) : 1;
+    return { corpus, gap, progress };
   }, [values]);
 
   const onSubmit = async (data: PlanFormValues) => {
@@ -141,13 +143,20 @@ export function PlanForm({
 
     setSaveError(null);
     setIsSaving(true);
-    const result = planId
-      ? await updatePlan(planId, data, initialName ?? t("planForm.defaultName"))
-      : await createPlan(data);
+    let result: Awaited<ReturnType<typeof createPlan>>;
+    try {
+      result = planId
+        ? await updatePlan(planId, data, initialName ?? t("planForm.defaultName"))
+        : await createPlan(data);
+    } catch {
+      setIsSaving(false);
+      setSaveError(t("errorPage.description"));
+      return;
+    }
     setIsSaving(false);
 
     if ("error" in result) {
-      setSaveError(t("validation.required"));
+      setSaveError(t("errorPage.description"));
       return;
     }
     router.push(`/plan/${result.id}`);
@@ -199,7 +208,7 @@ export function PlanForm({
                 increaseAriaLabel={t("common.increase")}
               />
               {errors.currentAge && (
-                <p id="currentAge-error" className="text-xs text-destructive">
+                <p id="currentAge-error" className="text-sm text-destructive">
                   {fieldErrorMessage("currentAge", errors.currentAge, t)}
                 </p>
               )}
@@ -219,7 +228,7 @@ export function PlanForm({
                 increaseAriaLabel={t("common.increase")}
               />
               {errors.retirementAge && (
-                <p id="retirementAge-error" className="text-xs text-destructive">
+                <p id="retirementAge-error" className="text-sm text-destructive">
                   {fieldErrorMessage("retirementAge", errors.retirementAge, t)}
                 </p>
               )}
@@ -239,7 +248,7 @@ export function PlanForm({
                 increaseAriaLabel={t("common.increase")}
               />
               {errors.lifeExpectancy && (
-                <p id="lifeExpectancy-error" className="text-xs text-destructive">
+                <p id="lifeExpectancy-error" className="text-sm text-destructive">
                   {fieldErrorMessage("lifeExpectancy", errors.lifeExpectancy, t)}
                 </p>
               )}
@@ -257,7 +266,7 @@ export function PlanForm({
                 helperText={currencyPerMonthHelper(values.monthlyExpenseToday)}
               />
               {errors.monthlyExpenseToday && (
-                <p id="monthlyExpenseToday-error" className="text-xs text-destructive">
+                <p id="monthlyExpenseToday-error" className="text-sm text-destructive">
                   {fieldErrorMessage("monthlyExpenseToday", errors.monthlyExpenseToday, t)}
                 </p>
               )}
@@ -318,12 +327,12 @@ export function PlanForm({
                   <Label
                     key={level}
                     htmlFor={`risk-${level}`}
-                    className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent"
+                    className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/60 has-[[data-checked]]:border-primary has-[[data-checked]]:bg-accent has-[[data-checked]]:hover:bg-accent"
                   >
                     <RadioGroupItem value={level} id={`risk-${level}`} className="mt-0.5" />
                     <span>
                       <span className="block font-medium">{t(`riskLevel.${level}`)}</span>
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="block text-sm text-muted-foreground">
                         {(RISK_PROFILES[level].defaultReturn * 100).toFixed(0)}% / {t("common.years")}
                       </span>
                     </span>
@@ -354,7 +363,7 @@ export function PlanForm({
                   onChange={(v) => setValue("pensionMonthlyToday", v, { shouldValidate: true })}
                   helperText={currencyPerMonthHelper(values.pensionMonthlyToday)}
                 />
-                <p className="text-xs text-muted-foreground">{t("planForm.pensionCard.note")}</p>
+                <p className="text-sm text-muted-foreground">{t("planForm.pensionCard.note")}</p>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -481,7 +490,7 @@ export function PlanForm({
                       <SelectItem key={method} value={method} label={t(`corpusMethod.${method}`)}>
                         <span className="flex flex-col gap-0.5 py-0.5 whitespace-normal">
                           <span>{t(`corpusMethod.${method}`)}</span>
-                          <span className="text-xs font-normal text-muted-foreground">
+                          <span className="text-sm font-normal text-muted-foreground">
                             {t(`corpusMethodDescription.${method}`)}
                           </span>
                         </span>
@@ -489,7 +498,7 @@ export function PlanForm({
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {t(`corpusMethodDescription.${values.corpusMethod ?? "annuity"}`)}
                 </p>
               </div>
@@ -497,7 +506,11 @@ export function PlanForm({
           </AccordionItem>
         </Accordion>
 
-        {saveError && <p className="text-sm text-destructive">{saveError}</p>}
+        {saveError && (
+          <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
+            {saveError}
+          </p>
+        )}
 
         <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSaving}>
           {isSaving && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
@@ -505,7 +518,7 @@ export function PlanForm({
         </Button>
       </div>
 
-      <Card className="lg:sticky lg:top-6">
+      <Card className="lg:sticky lg:top-20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <PiggyBank className="size-5 shrink-0 text-primary" aria-hidden="true" />
@@ -513,19 +526,37 @@ export function PlanForm({
           </CardTitle>
           <CardDescription>{t("planForm.subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div>
-            <p className="text-xs text-muted-foreground">{t("planForm.livePreview.corpusNeeded")}</p>
-            <p className="font-mono text-xl font-semibold">
+            <p className="text-sm text-muted-foreground">{t("planForm.livePreview.corpusNeeded")}</p>
+            <p className="font-mono text-3xl font-semibold text-primary drop-shadow-[0_0_14px_var(--glow)] tabular-nums">
               {formatCurrency(preview.corpus.selected, locale)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">
+            <div className="flex items-baseline justify-between gap-2 text-sm">
+              <span className="text-muted-foreground">{t("landing.preview.progress")}</span>
+              <span className="font-mono font-semibold tabular-nums">{Math.round(preview.progress * 100)}%</span>
+            </div>
+            <div
+              role="progressbar"
+              aria-valuenow={Math.round(preview.progress * 100)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted"
+            >
+              <div
+                className={`h-full rounded-full transition-[width] duration-300 ${preview.gap > 0 ? "bg-destructive" : "bg-primary"}`}
+                style={{ width: `${preview.progress * 100}%` }}
+              />
+            </div>
+          </div>
+          <div className="border-t pt-4">
+            <p className="text-sm text-muted-foreground">
               {t("planForm.livePreview.requiredMonthly")}
             </p>
             <p
-              className={`font-mono text-xl font-semibold ${
+              className={`font-mono text-lg font-semibold tabular-nums ${
                 preview.gap > 0 ? "text-destructive" : "text-success"
               }`}
             >

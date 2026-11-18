@@ -45,8 +45,13 @@ export function PlanCard({
   const progress = corpusNeeded > 0 ? Math.min(1, Math.max(0, projected / corpusNeeded)) : 1;
 
   const onDuplicate = async () => {
-    await duplicatePlan(id);
-    router.refresh();
+    try {
+      await duplicatePlan(id);
+    } catch {
+      // ทำสำเนาไม่สำเร็จ — โหลดรายการใหม่ให้เห็นสถานะจริง
+    } finally {
+      router.refresh();
+    }
   };
 
   if (deleted) return null;
@@ -82,7 +87,7 @@ export function PlanCard({
         </DropdownMenu>
       </CardHeader>
       <CardContent className="space-y-2">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {t("dashboard.lastEdited")}: {new Date(updatedAt).toLocaleDateString(locale === "th" ? "th-TH" : "en-US")}
         </p>
         <p className="text-sm">

@@ -63,7 +63,7 @@ export function CurrencyField({
           ))}
         </div>
       )}
-      {helperText && <p className="text-xs text-muted-foreground">{helperText}</p>}
+      {helperText && <p className="text-sm text-muted-foreground">{helperText}</p>}
     </div>
   );
 }

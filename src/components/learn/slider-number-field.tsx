@@ -62,7 +62,7 @@ export function SliderNumberField({
           {...inputProps}
         />
         {suffix && (
-          <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-xs text-muted-foreground">
+          <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-sm text-muted-foreground">
             {suffix}
           </span>
         )}

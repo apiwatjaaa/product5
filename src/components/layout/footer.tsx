@@ -7,7 +7,7 @@ export async function Footer() {
 
   return (
     <footer className="border-t print:hidden">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2 px-4 py-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2 px-4 py-6 text-center text-sm text-muted-foreground sm:flex-row sm:justify-between sm:text-left">
         <p>
           © {year} {t("brand.name")} — {t("brand.school")}
         </p>

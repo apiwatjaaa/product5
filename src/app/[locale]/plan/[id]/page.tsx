@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/navigation";
 import { rowToPlanInput } from "@/lib/plans/mapping";
 import { ResultsView } from "@/components/plan/results-view";
@@ -11,15 +11,12 @@ export default async function PlanDetailPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     redirect({ href: `/login?next=/plan/${id}`, locale });
   }
 
+  const supabase = await createClient();
   const { data: plan, error } = await supabase
     .from("plans")
     .select("*, plan_goals(*)")

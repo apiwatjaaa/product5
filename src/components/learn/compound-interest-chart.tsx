@@ -223,7 +223,7 @@ export function CompoundInterestChart() {
                 <p className="mt-1 font-mono text-xl font-semibold text-success">
                   {formatCurrency(startEarlyResult.corpusEarly, locale)}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {t("totalContributedLabel")}: {formatCurrency(startEarlyResult.contributedEarly, locale)}
                 </p>
               </div>
@@ -232,7 +232,7 @@ export function CompoundInterestChart() {
                 <p className="mt-1 font-mono text-xl font-semibold">
                   {formatCurrency(startEarlyResult.corpusLate, locale)}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {t("totalContributedLabel")}: {formatCurrency(startEarlyResult.contributedLate, locale)}
                 </p>
               </div>

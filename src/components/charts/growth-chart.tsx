@@ -196,6 +196,7 @@ export function GrowthChart({
             ))}
           <ReferenceLine
             y={target}
+            ifOverflow="extendDomain"
             stroke="var(--color-chart-4)"
             strokeDasharray="6 3"
             label={{ value: t("target"), position: "insideTopRight", fontSize: 12, fill: "var(--color-chart-4)" }}

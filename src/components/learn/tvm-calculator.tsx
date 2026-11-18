@@ -94,13 +94,13 @@ export function TvmCalculator() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-lg border p-4">
-            <p className="text-xs text-muted-foreground">{t("futureValue")}</p>
+            <p className="text-sm text-muted-foreground">{t("futureValue")}</p>
             <p className="mt-1 font-mono text-xl font-semibold text-primary">
               {formatCurrency(futureVal, locale)}
             </p>
           </div>
           <div className="rounded-lg border p-4">
-            <p className="text-xs text-muted-foreground">{t("gained")}</p>
+            <p className="text-sm text-muted-foreground">{t("gained")}</p>
             <p className="mt-1 font-mono text-xl font-semibold text-success">
               {formatCurrency(gained, locale)}
             </p>

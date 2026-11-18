@@ -55,7 +55,7 @@ export function InflationCalculator() {
               onChange={setPriceToday}
               quickAddSteps={[]}
             />
-            <p className="text-xs text-muted-foreground">{t("pricePlaceholder")}</p>
+            <p className="text-sm text-muted-foreground">{t("pricePlaceholder")}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="inf-years">{t("years")}</Label>
@@ -85,7 +85,7 @@ export function InflationCalculator() {
 
         <div className="space-y-3">
           <div className="rounded-lg border p-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {t("futurePriceLabel", { price: formatCurrency(priceToday, locale), years })}
             </p>
             <p className="mt-1 font-mono text-xl font-semibold text-destructive">
@@ -93,7 +93,7 @@ export function InflationCalculator() {
             </p>
           </div>
           <div className="rounded-lg border p-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {t("purchasingPowerLabel", {
                 amount: formatCurrency(REFERENCE_AMOUNT, locale),
                 years,
@@ -102,7 +102,7 @@ export function InflationCalculator() {
             <p className="mt-1 font-mono text-xl font-semibold text-destructive">
               {formatCurrency(realValueOfReference, locale)}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t("documentedExample", {
                 amount: formatNumber(REFERENCE_AMOUNT, locale),
                 rate: DOCUMENTED_RATE * 100,

@@ -17,10 +17,10 @@ export default async function LearnHubPage({
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 lg:py-16">
-      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
-      <p className="mt-2 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
+      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h1>
+      <p className="mt-3 max-w-2xl text-muted-foreground sm:text-lg">{t("subtitle")}</p>
 
-      <div className="mt-8 divide-y border-t border-b lg:mt-24">
+      <div className="mt-8 divide-y border-t border-b lg:mt-12">
         {LEARN_ARTICLES.map((article, index) => {
           const Icon = ARTICLE_ICONS[article.slug];
           return (
@@ -34,8 +34,8 @@ export default async function LearnHubPage({
                   aria-hidden="true"
                 />
                 <div className="flex-1">
-                  <h2 className="font-semibold">{isTh ? article.titleTh : article.titleEn}</h2>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
+                  <h2 className="text-lg font-semibold">{isTh ? article.titleTh : article.titleEn}</h2>
+                  <p className="mt-1 text-[0.95rem] leading-relaxed text-muted-foreground">
                     {isTh ? article.summaryTh : article.summaryEn}
                   </p>
                 </div>

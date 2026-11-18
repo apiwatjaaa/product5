@@ -86,7 +86,7 @@ export function PercentField({
             className="pr-5 text-right font-mono"
             {...inputProps}
           />
-          <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-xs text-muted-foreground">
+          <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-sm text-muted-foreground">
             %
           </span>
         </div>
@@ -106,7 +106,7 @@ export function PercentField({
           ))}
         </div>
       )}
-      {helperText && <p className="text-xs text-muted-foreground">{helperText}</p>}
+      {helperText && <p className="text-sm text-muted-foreground">{helperText}</p>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PlanCard } from "@/components/plan/plan-card";
 import { calculateCorpus, calculateGap, calculateProjectedSavings } from "@/lib/finance/corpus";
@@ -13,15 +13,12 @@ export default async function DashboardPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("dashboard");
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) {
     redirect({ href: "/login?next=/dashboard", locale });
   }
 
+  const supabase = await createClient();
   const { data: plans } = await supabase
     .from("plans")
     .select("*, plan_goals(*)")
@@ -29,15 +26,15 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 lg:py-16">
-      <div className="mb-8 flex items-center justify-between gap-4 lg:mb-24">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
+      <div className="mb-8 flex items-center justify-between gap-4 lg:mb-12">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h1>
         <Button render={<Link href="/plan/new">{t("newPlan")}</Link>} />
       </div>
 
       {!plans || plans.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
-          <p className="font-semibold">{t("empty.title")}</p>
-          <p className="text-sm text-muted-foreground">{t("empty.description")}</p>
+          <p className="text-lg font-semibold">{t("empty.title")}</p>
+          <p className="text-muted-foreground">{t("empty.description")}</p>
           <Button render={<Link href="/plan/new">{t("empty.cta")}</Link>} className="mt-2" />
         </div>
       ) : (

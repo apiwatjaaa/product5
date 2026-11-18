@@ -9,7 +9,8 @@ export function useCountUp(target: number, durationMs = 900): number {
   const startRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // แท็บไม่ได้แสดงอยู่ (requestAnimationFrame จะหยุด) หรือผู้ใช้ปิดแอนิเมชัน — แสดงค่าจริงทันที
+    if (document.visibilityState !== "visible" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setValue(target);
       return;
     }
@@ -29,7 +30,12 @@ export function useCountUp(target: number, durationMs = 900): number {
     }
 
     frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
+    // กันกรณีเบราว์เซอร์หน่วง requestAnimationFrame (เช่น แท็บอยู่เบื้องหลัง) จนตัวเลขค้างกลางทาง
+    const finish = window.setTimeout(() => setValue(target), durationMs + 150);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(finish);
+    };
   }, [target, durationMs]);
 
   return value;

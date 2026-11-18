@@ -63,7 +63,7 @@ export function RiskReturnCalculator() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {t("worstCase")} ({formatPercent(profile.returnRange.worst, locale, 0)}/{t("perYear")})
             </p>
             <p className="mt-1 font-mono text-xl font-semibold text-destructive">
@@ -71,7 +71,7 @@ export function RiskReturnCalculator() {
             </p>
           </div>
           <div className="rounded-lg border border-success/30 bg-success/5 p-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {t("bestCase")} ({formatPercent(profile.returnRange.best, locale, 0)}/{t("perYear")})
             </p>
             <p className="mt-1 font-mono text-xl font-semibold text-success">

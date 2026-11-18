@@ -51,9 +51,9 @@ export default async function LearnArticlePage({
       <div className="mt-8 space-y-8">
         {article.sections.map((section, index) => (
           <div key={index} className="space-y-3">
-            <h2 className="text-lg font-semibold">{isTh ? section.headingTh : section.headingEn}</h2>
+            <h2 className="text-xl font-semibold">{isTh ? section.headingTh : section.headingEn}</h2>
             {(isTh ? section.bodyTh : section.bodyEn).map((paragraph, pIndex) => (
-              <p key={pIndex} className="leading-relaxed text-foreground/90">
+              <p key={pIndex} className="max-w-[68ch] leading-[1.8] text-foreground/90">
                 {paragraph}
               </p>
             ))}

@@ -39,6 +39,38 @@ import { formatCurrency } from "@/lib/format";
 import { useCountUp } from "@/lib/use-count-up";
 import type { PlanInput } from "@/lib/finance/types";
 
+/** วงแหวนแสดงว่าเงินที่คาดว่าจะมี คิดเป็นกี่ % ของเป้าหมาย */
+function ProgressRing({ value }: { value: number }) {
+  const t = useTranslations("results.summary");
+  const pct = Math.round(value * 100);
+  const r = 52;
+  const c = 2 * Math.PI * r;
+  const done = value >= 1;
+  return (
+    <div className="relative size-40" role="img" aria-label={t("progressAria", { pct })}>
+      <svg viewBox="0 0 120 120" className="size-full -rotate-90">
+        <circle cx="60" cy="60" r={r} fill="none" stroke="var(--color-muted)" strokeWidth="10" />
+        <circle
+          cx="60"
+          cy="60"
+          r={r}
+          fill="none"
+          stroke={done ? "var(--color-success)" : "var(--color-primary)"}
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - value)}
+          className="drop-shadow-[0_0_8px_var(--glow)] transition-[stroke-dashoffset] duration-1000 ease-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-mono text-4xl font-semibold tabular-nums">{pct}%</span>
+        <span className="text-xs font-medium text-muted-foreground">{t("progressUnit")}</span>
+      </div>
+    </div>
+  );
+}
+
 export function ResultsView({ input }: { input: PlanInput }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -63,12 +95,14 @@ export function ResultsView({ input }: { input: PlanInput }) {
   const requiredPMT = input.monthlyDeposit + requiredInvestmentPMT;
   const savingIsSufficient = input.monthlyDeposit + input.monthlyInvestment >= requiredPMT;
 
+  const progress = corpus.selected > 0 ? Math.min(1, Math.max(0, projected / corpus.selected)) : 1;
+
   const corpusDisplay = useCountUp(corpus.selected);
   const requiredPmtDisplay = useCountUp(requiredPMT);
   const expenseDisplay = useCountUp(corpus.expenseAtRetirement);
 
   return (
-    <div className="space-y-8 lg:space-y-24">
+    <div className="space-y-8 lg:space-y-12">
       {corpus.netMonthlyNeed === 0 && (
         <div className="flex items-center gap-2 rounded-lg border border-success/40 bg-success/5 p-4 text-sm font-medium text-success">
           <CheckCircle2 className="size-5 shrink-0" />
@@ -76,62 +110,68 @@ export function ResultsView({ input }: { input: PlanInput }) {
         </div>
       )}
 
-      {/* 1. สรุปตัวเลขใหญ่ */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
-              <PiggyBank className="size-4 shrink-0" aria-hidden="true" />
-              {t("results.summary.corpusNeeded")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-mono text-2xl font-semibold drop-shadow-[0_0_14px_var(--glow)] tabular-nums">
-              {formatCurrency(corpusDisplay, locale)}
+      {/* 1. แผงสรุปหลัก: วงแหวนความคืบหน้า + ตัวเลขสำคัญ 3 ตัว */}
+      <Card className="relative overflow-hidden border-primary/25 shadow-xl shadow-black/20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -left-24 size-80 rounded-full bg-[radial-gradient(closest-side,var(--glow),transparent)] opacity-70"
+        />
+        <CardContent className="relative grid grid-cols-1 items-center gap-8 py-2 md:grid-cols-[auto_1fr] md:gap-10">
+          <div className="flex flex-col items-center gap-2">
+            <ProgressRing value={progress} />
+            <p className="text-center text-sm text-muted-foreground">
+              {t("results.summary.projectedLabel")}{" "}
+              <span className="font-mono font-semibold text-foreground tabular-nums">{formatCurrency(projected, locale)}</span>
             </p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
-              <Wallet className="size-4 shrink-0" aria-hidden="true" />
-              {t("results.summary.requiredMonthly")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className={`font-mono text-2xl font-semibold tabular-nums ${savingIsSufficient ? "text-success" : "text-destructive"}`}>
-              {formatCurrency(requiredPmtDisplay, locale)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t("results.summary.comparedToActual")}:{" "}
-              {formatCurrency(input.monthlyDeposit + input.monthlyInvestment, locale)}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted-foreground uppercase">
-              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
-              {t("results.summary.expenseAtRetirement")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-mono text-2xl font-semibold tabular-nums">
-              {formatCurrency(expenseDisplay, locale)}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t("results.summary.adjustedFromToday", {
-                amount: formatCurrency(input.monthlyExpenseToday, locale),
-              })}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:border-l md:pl-10">
+            <div>
+              <dt className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <PiggyBank className="size-4 shrink-0" aria-hidden="true" />
+                {t("results.summary.corpusNeeded")}
+              </dt>
+              <dd className="mt-2 font-mono text-[1.6rem] leading-tight font-semibold text-primary drop-shadow-[0_0_14px_var(--glow)] tabular-nums">
+                {formatCurrency(corpusDisplay, locale)}
+              </dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <Wallet className="size-4 shrink-0" aria-hidden="true" />
+                {t("results.summary.requiredMonthly")}
+              </dt>
+              <dd
+                className={`mt-2 font-mono text-[1.6rem] leading-tight font-semibold tabular-nums ${
+                  savingIsSufficient ? "text-success" : "text-destructive"
+                }`}
+              >
+                {formatCurrency(requiredPmtDisplay, locale)}
+              </dd>
+              <dd className="mt-1 text-sm text-muted-foreground">
+                {t("results.summary.comparedToActual")}:{" "}
+                {formatCurrency(input.monthlyDeposit + input.monthlyInvestment, locale)}
+              </dd>
+            </div>
+            <div>
+              <dt className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
+                {t("results.summary.expenseAtRetirement")}
+              </dt>
+              <dd className="mt-2 font-mono text-[1.6rem] leading-tight font-semibold tabular-nums">
+                {formatCurrency(expenseDisplay, locale)}
+              </dd>
+              <dd className="mt-1 text-sm text-muted-foreground">
+                {t("results.summary.adjustedFromToday", {
+                  amount: formatCurrency(input.monthlyExpenseToday, locale),
+                })}
+              </dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
 
       {input.pensionMonthlyToday > 0 && (
-        <p className="text-xs text-muted-foreground">{t("results.pensionAssumption")}</p>
+        <p className="text-sm text-muted-foreground">{t("results.pensionAssumption")}</p>
       )}
 
       {/* 2. กล่องเตือนเมื่อออมไม่ทันเป้า */}
@@ -192,7 +232,7 @@ export function ResultsView({ input }: { input: PlanInput }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
+            <ul className="list-disc space-y-1.5 pl-5 text-muted-foreground">
               <li>{t("results.recommend.savingTips.payYourselfFirst")}</li>
               <li>{t("results.recommend.savingTips.autoTransfer")}</li>
               <li>{t("results.recommend.savingTips.reviewYearly")}</li>

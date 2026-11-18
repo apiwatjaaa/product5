@@ -2,9 +2,13 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { planFormToInsertRow, planFormToUpdateRow } from "@/lib/plans/mapping";
-import type { PlanFormValues } from "@/lib/validation/planSchema";
+import { planFormSchema, type PlanFormValues } from "@/lib/validation/planSchema";
 
-export async function createPlan(values: PlanFormValues, name = "แผนของฉัน") {
+export async function createPlan(rawValues: PlanFormValues, name = "แผนของฉัน") {
+  // ตรวจข้อมูลซ้ำฝั่งเซิร์ฟเวอร์ — ห้ามเชื่อข้อมูลที่ส่งมาจากเบราว์เซอร์อย่างเดียว
+  const parsed = planFormSchema.safeParse(rawValues);
+  if (!parsed.success) return { error: "invalid_input" as const };
+  const values = parsed.data;
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,7 +39,10 @@ export async function createPlan(values: PlanFormValues, name = "แผนขอ
   return { id: plan.id as string };
 }
 
-export async function updatePlan(id: string, values: PlanFormValues, name: string) {
+export async function updatePlan(id: string, rawValues: PlanFormValues, name: string) {
+  const parsed = planFormSchema.safeParse(rawValues);
+  if (!parsed.success) return { error: "invalid_input" as const };
+  const values = parsed.data;
   const supabase = await createClient();
 
   const { data: user } = await supabase.auth.getUser();
@@ -73,7 +80,9 @@ export async function deletePlan(id: string) {
   return { success: true };
 }
 
-export async function renamePlan(id: string, name: string) {
+export async function renamePlan(id: string, rawName: string) {
+  const name = rawName.trim().slice(0, 120);
+  if (!name) return { error: "invalid_input" as const };
   const supabase = await createClient();
   const { error } = await supabase.from("plans").update({ name }).eq("id", id);
   if (error) return { error: error.message };

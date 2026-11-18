@@ -87,7 +87,7 @@ export function RealReturnCalculator() {
             isNegative ? "border-destructive/40 bg-destructive/5" : "border-success/40 bg-success/5"
           }`}
         >
-          <p className="text-xs text-muted-foreground">{t("realReturn")}</p>
+          <p className="text-sm text-muted-foreground">{t("realReturn")}</p>
           <p
             className={`mt-1 font-mono text-2xl font-semibold ${
               isNegative ? "text-destructive" : "text-success"

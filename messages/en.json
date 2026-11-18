@@ -11,7 +11,8 @@
     "planNew": "Start calculating",
     "dashboard": "My plans",
     "learn": "Financial knowledge",
-    "login": "Log in"
+    "login": "Log in",
+    "mainMenu": "Main menu"
   },
   "pwa": {
     "install": "Install app"
@@ -27,7 +28,7 @@
     "en": "English"
   },
   "landing": {
-    "heroTitle": "Know how much you need before you can retire comfortably",
+    "heroTitle": "Know how much you need to <hl>retire comfortably</hl>",
     "heroSubtitle": "Calculate the nest egg you need at retirement, with a year-by-year savings plan that fully accounts for inflation.",
     "cta": "Start calculating for free",
     "secondaryCta": "See how it works",
@@ -38,7 +39,10 @@
     },
     "preview": {
       "label": "Example result",
-      "caption": "Calculated from example data, not your own result"
+      "caption": "Calculated from example data, not your own result",
+      "ageSpan": "Age 30 → 60",
+      "progress": "Saved so far",
+      "chip": "Inflation included"
     },
     "howItWorks": {
       "title": "Get started in 3 simple steps",
@@ -55,7 +59,8 @@
           "title": "Adjust anytime",
           "description": "Change your retirement age, risk level, or special goals and see updated results instantly"
         }
-      }
+      },
+      "lead": "Takes under two minutes. No finance background needed."
     },
     "features": {
       "calculate": {
@@ -69,7 +74,46 @@
       "learn": {
         "title": "Learn the financial basics",
         "description": "Short, plain-language articles on compound interest, inflation, and risk before you start planning for real."
-      }
+      },
+      "title": "What you can do",
+      "go": "Take a look"
+    },
+    "madeBy": "A Grade 11 student project at {school}",
+    "pad": {
+      "binding": "Your retirement calendar",
+      "ageRange": "Age {from} → {to}",
+      "title": "Count it: years until you retire",
+      "yearsUnit": "years",
+      "srYears": "{years} years until retirement",
+      "expenseLabel": "Monthly spending today (THB)",
+      "inflationLine": "At 3% inflation, keeping today's {today} a month of spending power will take <strong>{future}</strong> a month in {years} years (about {times}×).",
+      "cta": "Build the full plan from these numbers",
+      "footnote": "No sign-up needed to try. Uses 3% yearly inflation by default — adjustable in the full plan."
+    },
+    "proof": {
+      "title": "Checked against Excel",
+      "lead": "Every formula in the app has automated tests and is compared with Microsoft Excel's FV, PV and PMT functions. Here is one real test case.",
+      "caseTitle": "Test case TC-01",
+      "caseInput": "Age 25, retire at 60, live to 85 · spending 20,000 THB/month · existing investments 100,000 THB · investing 8,000 THB/month · 5% return · 3% inflation",
+      "colItem": "Item (THB)",
+      "colProgram": "This app",
+      "rows": {
+        "expense": "Monthly spending at retirement",
+        "corpus": "Nest egg needed",
+        "projected": "Projected savings",
+        "monthly": "Required monthly saving"
+      },
+      "verdict": "Matches Excel on every value"
+    },
+    "closing": {
+      "title": "Retirement day will come. Start preparing today.",
+      "lead": "Enter your numbers once and get the target, a year-by-year chart and calculated fixes."
+    },
+    "stats": {
+      "excel": "Matches Excel",
+      "methods": "Nest-egg methods",
+      "articles": "Finance articles",
+      "free": "Cost — completely free"
     }
   },
   "riskLevel": {
@@ -160,7 +204,10 @@
       "requiredMonthly": "Required monthly saving",
       "comparedToActual": "compared to what you can actually save",
       "expenseAtRetirement": "Monthly expense at retirement",
-      "adjustedFromToday": "Inflation-adjusted from {amount} today"
+      "adjustedFromToday": "Inflation-adjusted from {amount} today",
+      "projectedLabel": "Projected",
+      "progressUnit": "of target",
+      "progressAria": "Projected savings reach {pct}% of the target"
     },
     "gapAlert": {
       "titleShort": "You're short by",
@@ -224,6 +271,29 @@
     "goalShortfall": {
       "title": "Some special goals leave you short on funds",
       "item": "{goalName} leaves you short — negative from age {negativeFromAge}, off by up to {shortfall} at worst; save an extra {requiredExtraMonthly}/month starting today to avoid it"
+    },
+    "options": {
+      "subtitle": "Pick one, or combine them. Every number is calculated from your plan.",
+      "perMonth": "{amount}/month",
+      "saving": {
+        "title": "Save more, up to",
+        "note": "{increase} more each month"
+      },
+      "delay": {
+        "title": "Retire later, at",
+        "value": "age {age}",
+        "note": "{years} more working years"
+      },
+      "expense": {
+        "title": "Lower retirement spending to",
+        "note": "In today’s money"
+      },
+      "risk": {
+        "title": "Take a higher-risk portfolio",
+        "value": "{rate}% return a year",
+        "reach": "Reaches the target with {amount} to spare, but with more risk of losing principal",
+        "short": "Still {amount} short, with more risk of losing principal"
+      }
     }
   },
   "common": {
@@ -245,7 +315,8 @@
       "submit": "Log in",
       "submitting": "Logging in...",
       "noAccount": "Don't have an account?",
-      "registerLink": "Sign up"
+      "registerLink": "Sign up",
+      "subtitle": "Sign in to view and edit your saved retirement plans"
     },
     "register": {
       "title": "Sign up",
@@ -258,7 +329,8 @@
       "loginLink": "Log in",
       "passwordMismatch": "Passwords do not match",
       "checkEmailTitle": "Check your email to confirm your account",
-      "checkEmailDescription": "We've sent a confirmation link to {email}. Click the link in the email to activate your account before logging in."
+      "checkEmailDescription": "We've sent a confirmation link to {email}. Click the link in the email to activate your account before logging in.",
+      "subtitle": "Create a free account to save your plans and come back anytime"
     },
     "signOut": "Log out",
     "errors": {
@@ -267,7 +339,9 @@
       "emailTaken": "This email is already registered",
       "passwordTooShort": "Password must be at least 6 characters",
       "rateLimited": "Too many attempts. Please wait and try again",
-      "generic": "Something went wrong. Please try again"
+      "generic": "Something went wrong. Please try again",
+      "emailNotConfirmed": "This email has not been confirmed yet. Click the confirmation link in your sign-up email, then sign in.",
+      "network": "Could not reach the server. Check your internet connection and try again."
     }
   },
   "dashboard": {
@@ -421,5 +495,11 @@
       "bracketRangeOpen": "Over {from} baht",
       "scopeNote": "Covers salaried income only, using the standard expense deduction and personal allowance. It excludes other deductions such as social security, SSF/RMF funds, a spouse, or children, so your actual tax may be lower."
     }
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "This page failed to load. Try again, or head back to the home page.",
+    "retry": "Try again",
+    "backHome": "Back to home"
   }
 }

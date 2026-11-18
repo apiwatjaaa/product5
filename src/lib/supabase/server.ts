@@ -26,3 +26,22 @@ export async function createClient() {
     },
   );
 }
+
+/**
+ * ดึงผู้ใช้ปัจจุบันแบบไม่ทำให้หน้าเว็บพัง
+ * ถ้ายังไม่ได้ตั้งค่า Supabase หรือเครือข่ายมีปัญหา จะถือว่ายังไม่ได้เข้าสู่ระบบแทนการโยน error
+ */
+export async function getCurrentUser() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return null;
+  }
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
+}

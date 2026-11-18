@@ -3,25 +3,25 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link, getPathname } from "@/i18n/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import { authErrorKey } from "@/lib/supabase/auth-errors";
+import { authErrorKey, safeNextPath } from "@/lib/supabase/auth-errors";
 import { registerSchema, type RegisterValues } from "@/lib/validation/authSchema";
 
 export default function RegisterPage() {
   const t = useTranslations("auth.register");
   const tErrors = useTranslations("auth.errors");
-  const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = safeNextPath(searchParams.get("next"));
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,12 +36,20 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterValues) => {
     setServerError(null);
     setIsSubmitting(true);
-    const supabase = createClient();
-    const { data: signUpData, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-    });
+    let result: Awaited<ReturnType<ReturnType<typeof createClient>["auth"]["signUp"]>>;
+    try {
+      const supabase = createClient();
+      result = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+    } catch {
+      setIsSubmitting(false);
+      setServerError(tErrors("generic"));
+      return;
+    }
     setIsSubmitting(false);
+    const { data: signUpData, error } = result;
 
     if (error) {
       setServerError(tErrors(authErrorKey(error.message) as "generic"));
@@ -63,13 +71,12 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push(next);
-    router.refresh();
+    window.location.assign(getPathname({ href: next, locale }));
   };
 
   if (pendingConfirmationEmail) {
     return (
-      <AuthCard title={t("title")}>
+      <AuthCard title={t("title")} description={t("subtitle")}>
         <p className="text-sm font-medium">{t("checkEmailTitle")}</p>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("checkEmailDescription", { email: pendingConfirmationEmail })}
@@ -84,27 +91,27 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthCard title={t("title")}>
+    <AuthCard title={t("title")} description={t("subtitle")}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="email">{t("email")}</Label>
           <Input id="email" type="email" autoComplete="email" {...register("email")} />
           {errors.email?.message && (
-            <p className="text-xs text-destructive">{tErrors(errors.email.message as "invalidEmail")}</p>
+            <p role="alert" className="text-sm text-destructive">{tErrors(errors.email.message as "invalidEmail")}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">{t("password")}</Label>
           <Input id="password" type="password" autoComplete="new-password" {...register("password")} />
           {errors.password?.message && (
-            <p className="text-xs text-destructive">{tErrors(errors.password.message as "passwordTooShort")}</p>
+            <p role="alert" className="text-sm text-destructive">{tErrors(errors.password.message as "passwordTooShort")}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
           <Input id="confirmPassword" type="password" autoComplete="new-password" {...register("confirmPassword")} />
           {errors.confirmPassword?.message && (
-            <p className="text-xs text-destructive">
+            <p role="alert" className="text-sm text-destructive">
               {errors.confirmPassword.message === "passwordMismatch"
                 ? t("passwordMismatch")
                 : tErrors(errors.confirmPassword.message as "passwordTooShort")}
@@ -112,9 +119,13 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {serverError && <p className="text-sm text-destructive">{serverError}</p>}
+        {serverError && (
+          <p role="alert" className="rounded-lg bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
+            {serverError}
+          </p>
+        )}
 
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
           {isSubmitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
           {isSubmitting ? t("submitting") : t("submit")}
         </Button>

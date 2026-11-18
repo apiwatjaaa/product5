@@ -48,7 +48,7 @@ export function MethodComparison({
           ))}
         </TableBody>
       </Table>
-      {showEqualNote && <p className="text-xs text-muted-foreground">{t("note")}</p>}
+      {showEqualNote && <p className="text-sm text-muted-foreground">{t("note")}</p>}
     </div>
   );
 }

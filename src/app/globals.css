@@ -141,9 +141,61 @@
     @apply bg-background text-foreground;
   }
   html {
+    /* ตัวหนังสือฐาน 17px ให้ผู้ใหญ่อ่านสบายขึ้น ทุกขนาดใน Tailwind ขยายตามสัดส่วนเดียวกัน */
+    font-size: 106.25%;
     @apply font-sans scroll-smooth;
+    accent-color: var(--primary);
+  }
+  body {
+    caret-color: var(--primary);
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  * {
+    scrollbar-color: color-mix(in oklch, var(--foreground) 25%, transparent) transparent;
   }
   ::selection {
     @apply bg-primary/25 text-foreground;
+  }
+}
+/* หน้าแรก: เส้นกราฟตัวอย่างค่อย ๆ วาดขึ้นตอนเปิดหน้า */
+@keyframes preview-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes preview-pop {
+  0%,
+  70% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.preview-line {
+  stroke-dasharray: 1;
+  animation: preview-draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+.preview-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: preview-pop 1.9s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-line,
+  .preview-dot {
+    animation: none;
   }
 }

@@ -35,9 +35,14 @@ export function InstallAppButton() {
   if (!installEvent) return null;
 
   const handleInstall = async () => {
-    await installEvent.prompt();
-    await installEvent.userChoice;
-    setInstallEvent(null);
+    try {
+      await installEvent.prompt();
+      await installEvent.userChoice;
+    } catch {
+      // ผู้ใช้ปิดหน้าต่างติดตั้ง หรือเบราว์เซอร์ไม่รองรับ
+    } finally {
+      setInstallEvent(null);
+    }
   };
 
   return (

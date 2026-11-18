@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const HIDDEN = "motion-safe:opacity-0 motion-safe:translate-y-4";
-const VISIBLE = "motion-safe:opacity-100 motion-safe:translate-y-0";
-
+/**
+ * เฟดขึ้นเบา ๆ เมื่อเลื่อนมาถึง
+ * - สิ่งที่อยู่ในจอตั้งแต่โหลดหน้า จะเห็นทันที (ไม่ซ่อนก่อน) — แก้กล่องหน้าแรกที่เคยว่างเปล่าตอนโหลด
+ * - ถ้า JavaScript ยังไม่ทำงาน เนื้อหาก็ยังแสดงครบ
+ */
 export function Reveal({
   children,
   className = "",
@@ -15,31 +17,41 @@ export function Reveal({
   delayMs?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [state, setState] = useState<"static" | "hidden" | "shown">("static");
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.9) return; // อยู่ในจอแล้ว ไม่ต้องซ่อน
+
+    setState("hidden");
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true);
+          setState("shown");
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
+  const motion =
+    state === "static"
+      ? ""
+      : `transition-[opacity,transform] duration-500 ease-out ${
+          state === "hidden" ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
+        }`;
+
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delayMs}ms` }}
-      className={`motion-safe:transition-all motion-safe:duration-700 motion-safe:ease-out ${
-        visible ? VISIBLE : HIDDEN
-      } ${className}`}
+      style={state === "shown" ? { transitionDelay: `${delayMs}ms` } : undefined}
+      className={`${motion} ${className}`}
     >
       {children}
     </div>

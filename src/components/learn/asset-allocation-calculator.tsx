@@ -39,7 +39,7 @@ export function AssetAllocationCalculator() {
               <Label
                 key={level}
                 htmlFor={`aa-risk-${level}`}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-accent"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/60 has-[[data-checked]]:border-primary has-[[data-checked]]:bg-accent has-[[data-checked]]:hover:bg-accent"
               >
                 <RadioGroupItem value={level} id={`aa-risk-${level}`} />
                 {tRisk(level)}
